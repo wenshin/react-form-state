@@ -1,0 +1,106 @@
+@formFieldInlineGap: 20px;
+@formElementHeight: 2em;
+@textColorInfo: #999;
+@textColorError: #F44336;
+@textColorWarn: #FF9800;
+@textColorSucc: #4CAF50;
+
+.form {
+    margin: 0 0 10px 0;
+    position: relative;
+    text-align: left;
+    box-sizing: border-box;
+
+    * {
+        box-sizing: border-box;
+    }
+
+    input {
+        height: @formElementHeight;
+    }
+
+    .form__group {
+        margin-bottom: 40px;
+    }
+
+    .form-control {
+        display: inline-block;
+    }
+
+    .form-control--full-width {
+        width: 100%;
+    }
+
+
+    .form-field {
+        position: relative;
+        padding: 0 0 0 15%;
+        margin: 15px 0;
+
+        .form-label {
+            text-align: right;
+            color: #333;
+            line-height: @formElementHeight;
+            padding-right: 1.618em;
+            position: absolute;
+            width: 15%;
+            left: 0;
+        }
+
+        .form-field__connect-text {
+            font-size: 1.2em;
+            vertical-align: middle;
+            line-height: @formElementHeight;
+        }
+
+        .form-field__required {
+            font-size: 1.1rem;
+            vertical-align: middle;
+            margin-right: 5px;
+            color: @textColorError;
+        }
+
+        .explanation {
+            /* text-top 用在这里，可以使得文字已文字底部对齐，很奇怪的情况！！！*/
+            vertical-align: text-top;
+            margin-left: @formFieldInlineGap;
+        }
+
+        .explanation--next-line {
+            margin-left: 0;
+            margin-bottom: 5px;
+            display: block;
+        }
+
+        .form-explain {
+            &.form-explain--inline {
+                display: inline-block;
+                margin-left: 10px;
+            }
+
+            &.form-explain--info {
+                color: @textColorInfo;
+            }
+
+            &.form-explain--error {
+                color: @textColorError;
+            }
+
+            &.form-explain--warn {
+                color: @textColorWarn;
+            }
+
+            &.form-explain--success {
+                color: @textColorSucc;
+            }
+        }
+
+        .form-explain__text {
+            line-height: @formElementHeight;
+        }
+    }
+
+    .form__static-text {
+        line-height: @formElementHeight;
+    }
+}

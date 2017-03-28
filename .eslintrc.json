@@ -1,0 +1,61 @@
+{
+  "extends": "airbnb",
+  "parser": "babel-eslint",
+  "parserOptions": {
+    "ecmaVersion": 6,
+    "sourceType": "module",
+    "ecmaFeatures": {
+      "experimentalObjectRestSpread": true,
+      "jsx": true
+    }
+  },
+  "root": true,
+  "env": {
+    "browser": true,
+    "node": true,
+    "commonjs": true,
+    "amd": true,
+    "mocha": true,
+    "es6": true
+  },
+  "globals": {
+    "Raven": true,
+    "logger": true
+  },
+  "rules": {
+    // 在必须';'结尾的代码风格下，该规则无意义。http://eslint.org/docs/rules/no-plusplus
+    "no-plusplus": "off",
+    "global-require": "warn",
+    // some webpack import will break this rule
+    "import/no-unresolved": "off",
+    // 'braavos/public/index.js' 这种自定义的路径也会报错，所以改为警告
+    "import/no-extraneous-dependencies": "warn",
+    "import/extensions": "off",
+    "no-use-before-define": ["error", {"functions": false}],
+    "no-param-reassign": "warn",
+    "no-restricted-syntax": "off",
+    // allow `1 + 'suffix'`
+    "prefer-template": "off",
+    "prefer-const": ["error", {"destructuring": "all"}],
+    // allow `{a: 1, b: 2}` with no comma as the end of object
+    "comma-dangle": "off",
+    // allow `let {abc} = object`
+    "object-curly-spacing": "off",
+    "max-len": ["warn", 150],
+    // allow `a ? b() || (c = d) : e()` as a expression
+    "no-unused-expressions": ["off", {"allowShortCircuit": true, "allowTernary": true}],
+    // prefer use single quotes in `<abc a='23'/>`
+    "jsx-quotes": ["error", "prefer-single"],
+    "react/jsx-indent": "warn",
+    // allow do not have `let React = require('react')`
+    "react/react-in-jsx-scope": "off",
+    // allow have multi component in a file
+    "react/no-multi-comp": "off",
+    // only warn when use () => {return 'a';}
+    "arrow-body-style": "warn",
+    "no-underscore-dangle": ["warn", { "allowAfterThis": true }],
+    "react/sort-comp": "off",
+    "react/jsx-filename-extension": "off",
+    "new-cap": "warn"
+  }
+}

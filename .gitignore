@@ -1,0 +1,16 @@
+*.DS_Store
+*.iml
+*.ipr
+*.iws
+.git/
+.idea
+.idea/*
+dist/
+build/
+logs/
+.sass-cache
+node_modules
+*.log
+./tmp
+
+public/assets/images/sprite.png

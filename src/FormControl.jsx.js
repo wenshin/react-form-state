@@ -1,16 +1,12 @@
 import {PropTypes} from 'react';
 import {fireEvent, isInputEventSupported} from './event';
+import FormState from './FormState';
 
 import DataSet from './DataSet.jsx';
 import FormChildComponent from './FormChildComponent.jsx';
 
 /**
- * 可以合并子元素的输入为单个输入并向上冒泡 change 事件。
- * 比如，如果`props.isCollectData`为 true，
- * 且有`<input name='a'/>` 和 `<input name='b'/>` 两个输入，
- * FormControl 会自动拦截两个 change 事件，把数据合并成`{a: '', b: ''}` ，并新触发一个 change 事件。
- *
- * 详细用法：
+ * 用法：
  *
  * ```
  * // 使用1：继承自定义 FormControl。便于封装 validators，达到非常好的可重用效果
@@ -32,17 +28,12 @@ import FormChildComponent from './FormChildComponent.jsx';
  * }
  *
  * // 通过继承，封装 validator，并且可以重新定义 validator
- * <CustomFormControl name value defaultValue validator />
- *
- * // 覆盖自定义的 validator
- * <CustomFormControl name value defaultValue validator />
+ * <CustomFormControl name value validator />
  *
  * // 使用2：封装多个数据为对象格式。以下例子会获得 {test: {a1, a2}} 的数据结构
  * <FormControl name='test'>
  *   <input name='a1' value defaultValue />
- *   <Explain explain={{type: 'err', message: 'foo'}} defaultExplain={} inline />
  *   <input name='a2' value defaultValue />
- *   <Explain explain={{type: 'err', message: 'foo'}} defaultExplain={} inline />
  * </FormControl>
  *
  * ```
@@ -50,6 +41,8 @@ import FormChildComponent from './FormChildComponent.jsx';
 export default class FormControl extends FormChildComponent {
   static propTypes = {
     name: PropTypes.string,
+    // 设置 defaultValue 表示把组件声明成 uncontrolled 组件
+    // 注意，defaultValue 和 value 只使用其中一个
     defaultValue: PropTypes.any,
     explain: PropTypes.shape({
       type: PropTypes.string,
@@ -59,6 +52,7 @@ export default class FormControl extends FormChildComponent {
       type: PropTypes.string,
       message: PropTypes.string
     }),
+    // 设置 value 表示把组件声明成 controlled 组件
     value: PropTypes.any,
     validator: PropTypes.shape({
       validate: PropTypes.func,
@@ -77,50 +71,24 @@ export default class FormControl extends FormChildComponent {
 
   constructor(props) {
     super(props);
+    this._dateSet = null;
     this._isCollectData = false;
   }
 
   get value() {
-    const val = this.props.value;
-    if (canUseDefault(val)) {
-      if (canUseDefault(this.formValue)) {
-        return this._isCollectData ? {} : val;
-      }
-      return this.formValue;
-    }
-    return val;
-  }
-
-  get defaultValue() {
-    const val = this.props.defaultValue;
-    if (canUseDefault(val)) {
-      if (canUseDefault(this.formDefaultValue)) {
-        return this._isCollectData ? {} : val;
-      }
-      return this.formDefaultValue;
-    }
-    return val;
-  }
-
-  get isValid() {
-    return !!Object.keys(this.explain || {});
+    return this.props.value || this.formValue;
   }
 
   get explain() {
-    return this.props.explain
-      || this.formExplain
-      || (this._isCollectData ? {} : this.props.explain);
-  }
-
-  get nestExplain() {
-    const explain = this.explain || {};
-    return explain.nestExplain || {};
+    if (this.props.explain) return this.props.explain;
+    if (this._isCollectData) {
+      return FormChildComponent.formatStateResult(this._result);
+    }
+    return FormChildComponent.formatResult(this._result) || {};
   }
 
   get defaultExplain() {
-    return this.props.defaultExplain
-      || this.formDefaultExplain
-      || (this._isCollectData ? {} : this.props.defaultExplain);
+    return this.props.defaultExplain;
   }
 
   get validator() {
@@ -132,19 +100,26 @@ export default class FormControl extends FormChildComponent {
       );
   }
 
-  getCollectedDataByName(name) {
-    if (this._isCollectData) {
-      return {
-        value: this.formValue && this.formValue[name],
-        explain: this.formExplain && this.formExplain[name]
-      };
+  get dataSetState() {
+    if (!this._isCollectData) return null;
+    if (!this._dataSet) {
+      this._dataSet = new FormState({
+        data: this.value,
+        validator: this.validator,
+        onStateChange: this.onDataSetChange
+      });
     }
-    throw new Error('can not getCollectedDataByName use when FormControl is not collect data mode');
+    return this._dataSet;
+  }
+
+  // 继承时可覆盖，设置联合校验等逻辑
+  onDataSetChange = (state) => {
+    this.triggerChange(state);
   }
 
   /**
    * 自主触发
-   * @param  {Any}          value        dataset 数据`{data, transformed, isValid, explains}`或者其它数据
+   * @param  {Any}          value        dataset 数据`{data, isValid, result}`或者其它数据
    * @param  {DomEventLike} srcEvent     原始对象
    * @return {undefined}
    */
@@ -162,15 +137,15 @@ export default class FormControl extends FormChildComponent {
       // 赋值后值会变成`value.toString()`。
       if (this._isCollectData) {
         _input.formControlValue = value.data;
+        _input.formControlResult = value;
       } else {
         _input.formControlValue = value;
+        if (this.validator) {
+          _input.formControlResult = this.validator.validate(value);
+        }
       }
 
-      if (this._isCollectData) {
-        _input.formControlData = value;
-      } else if (this.validator) {
-        _input.formControlData = this.validator.validate(value);
-      }
+      this._result = _input.formControlResult;
 
       // React 的 SyntheticEvent 是单例，如果执行流不中断会继续触发 srcEvent
       //
@@ -198,16 +173,6 @@ export default class FormControl extends FormChildComponent {
       onChange
     };
 
-    const dataSetAttrs = {
-      ref: 'dataSet',
-      data: this.value,
-      defaultData: this.defaultValue,
-      explain: this.explain,
-      onDataChange: data => this.triggerChange(data),
-      // 如果FormControl 的 validator 不是 Map 对象，那么不设置 DataSet 的验证
-      validator: this.validator && this.validator.has ? this.validator : undefined
-    };
-
     if (!customChildren && children) {
       this._isCollectData = true;
       customChildren = children;
@@ -217,14 +182,9 @@ export default class FormControl extends FormChildComponent {
       <div {...formControlAttrs}>
         <input hidden {...inputAttrs} />
         {this._isCollectData && customChildren
-          ? <DataSet {...dataSetAttrs}>{customChildren}</DataSet>
+          ? <DataSet state={this.dataSetState}>{customChildren}</DataSet>
           : customChildren}
       </div>
     );
   }
-}
-
-
-function canUseDefault(value) {
-  return typeof value === 'undefined' || value === null;
 }

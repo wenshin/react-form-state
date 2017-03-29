@@ -1,9 +1,12 @@
 import {PropTypes} from 'react';
 import ReactTooltip from 'react-tooltip';
 
+import Explain from './Explain';
+import FormState from './FormState';
+
 import DataSet from './DataSet.jsx';
 import HelpTips from './help-tip';
-import Explain from './Explain.jsx';
+import ExplainBase from './ExplainBase.jsx';
 import ExplainText from './ExplainText.jsx';
 import FormField from './FormField.jsx';
 import FormControl from './FormControl.jsx';
@@ -70,12 +73,25 @@ export default class Form extends DataSet {
     form: PropTypes.object
   };
 
+  constructor(props) {
+    super(props);
+    props.state.formatResult = function formatResult(result) {
+      if (result) {
+        if (result.isValid) {
+          return Explain.success('ok');
+        }
+        return Explain.fail(result.message);
+      }
+      return null;
+    };
+  }
+
   getChildContext() {
-    return {form: this};
+    return {form: this.props.state};
   }
 
   renderSubDataSet() {
-    let {className, children} = this.props;
+    const {className, children} = this.props;
     return (
       <div className={`form ${className || ''}`}>
         {children}
@@ -87,7 +103,7 @@ export default class Form extends DataSet {
 
 export class FormGroup extends FormChildComponent {
   render() {
-    let {title, children} = this.props;
+    const {title, children} = this.props;
     return (
       <div className='form__group'>
         {title ? (
@@ -112,8 +128,10 @@ export function FormStaticText(props) {
 export {
   DataSet,
   Explain,
+  ExplainBase,
   ExplainText,
   FormField,
+  FormState,
   TextField,
   FormControl,
   FormChildComponent,

@@ -1,7 +1,7 @@
 import _omit from 'lodash/omit';
 import React, {PropTypes, Children, cloneElement} from 'react';
 // import HelpTips from './help-tip';
-import Explain from './Explain.jsx';
+import Explain from './Explain';
 import ExplainText from './ExplainText.jsx';
 import FormChildComponent from './FormChildComponent.jsx';
 

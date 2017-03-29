@@ -1,4 +1,5 @@
 import {Component, PropTypes} from 'react';
+import Explain from './Explain';
 
 /**
  * FormChildComponent 表单元素组件的基类
@@ -9,6 +10,10 @@ export default class FormChildComponent extends Component {
     form: PropTypes.object
   };
 
+  static formatResult = formatResult;
+  static formatStateResult = formatStateResult;
+
+
   get form() {
     const {form} = this.context;
     return form || {};
@@ -18,16 +23,8 @@ export default class FormChildComponent extends Component {
     return this.form.data || {};
   }
 
-  get formDefaultData() {
-    return this.form.defaultData || {};
-  }
-
   get formExplains() {
-    return this.form.explains || {};
-  }
-
-  get formDefaultExplains() {
-    return this.form.defaultExplains || {};
+    return formatStateResult(this.form.result);
   }
 
   get formValue() {
@@ -35,23 +32,33 @@ export default class FormChildComponent extends Component {
     return this.formData[name];
   }
 
-  get formDefaultValue() {
-    const {name} = this.props; // eslint-disable-line react/prop-types
-    return this.formDefaultData[name];
-  }
-
   get formExplain() {
     const {name} = this.props; // eslint-disable-line react/prop-types
-    return this.formExplains[name];
-  }
-
-  get formDefaultExplain() {
-    const {name} = this.props; // eslint-disable-line react/prop-types
-    return this.formDefaultExplains[name];
+    return formatResult(this.form.result[name]);
   }
 
   get formValidator() {
     const {name} = this.props; // eslint-disable-line react/prop-types
     return this.form.validator && this.form.validator.get(name);
   }
+}
+
+
+function formatStateResult(result) {
+  const explains = {};
+  for (const key of Object.keys(result)) {
+    explains[key] = formatResult(result[key]);
+  }
+  return explains;
+}
+
+
+function formatResult(result) {
+  if (result) {
+    if (result.isValid) {
+      return Explain.success('ok');
+    }
+    return Explain.fail(result.message);
+  }
+  return null;
 }

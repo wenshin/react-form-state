@@ -1,6 +1,6 @@
-import Explain from './Explain.jsx';
+import ExplainBase from './ExplainBase.jsx';
 
-export default class ExplainText extends Explain {
+export default class ExplainText extends ExplainBase {
   inline = false;
 
   renderSub(explain) {

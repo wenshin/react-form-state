@@ -44,14 +44,6 @@ export default class FormControl extends FormChildComponent {
     // 设置 defaultValue 表示把组件声明成 uncontrolled 组件
     // 注意，defaultValue 和 value 只使用其中一个
     defaultValue: PropTypes.any,
-    explain: PropTypes.shape({
-      type: PropTypes.string,
-      message: PropTypes.string
-    }),
-    defaultExplain: PropTypes.shape({
-      type: PropTypes.string,
-      message: PropTypes.string
-    }),
     // 设置 value 表示把组件声明成 controlled 组件
     value: PropTypes.any,
     validator: PropTypes.shape({
@@ -79,16 +71,13 @@ export default class FormControl extends FormChildComponent {
     return this.props.value || this.formValue;
   }
 
-  get explain() {
-    if (this.props.explain) return this.props.explain;
-    if (this._isCollectData) {
-      return FormChildComponent.formatStateResult(this._result);
+  get result() {
+    if (!this.validator) {
+      return this.formResult;
+    } else if (this._isCollectData) {
+      return this.dataSetState.results;
     }
-    return FormChildComponent.formatResult(this._result) || {};
-  }
-
-  get defaultExplain() {
-    return this.props.defaultExplain;
+    return this._result;
   }
 
   get validator() {

@@ -71,21 +71,20 @@ export default class FormField extends FormChildComponent {
   renderExplain() {
     const {
       name,
+      explain,
       isExplainShow,
       isExplainInline
     } = this.props;
-    let {explain, defaultExplain} = this.props;
+    let {defaultExplain} = this.props;
 
-    if (isExplainShow && name) {
-      explain = explain || this.formExplain;
-    }
     if (typeof defaultExplain === 'string') {
       defaultExplain = Explain.info(defaultExplain);
     }
     return isExplainShow ? (
       <ExplainText
-        explain={explain}
+        name={name}
         inline={isExplainInline}
+        explain={explain}
         defaultExplain={defaultExplain}
       />
     ) : null;

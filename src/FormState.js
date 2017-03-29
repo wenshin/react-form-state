@@ -5,7 +5,7 @@ class FormState {
     this.data = options.data || {};
     this.validator = options.validator;
     this.onStateChange = options.onStateChange;
-    // 如果不是 edit 模式，那么首次数据校验错误信息不会存到 this.result 中
+    // 如果不是 edit 模式，那么首次数据校验错误信息不会存到 this.results 中
     // 这样新建默认不会显示很多必填的错误显示
     this.isEdit = options.isEdit;
     this.nestFailMessage = options.nestFailMessage || 'validation fail';
@@ -18,8 +18,17 @@ class FormState {
     return !this._invalidSet.size;
   }
 
+  getNestResult(name) {
+    const result = this.results[name];
+    const nest = (result && result.nest) || {};
+    if (nest instanceof FormState) {
+      return (nest && nest.results) || {};
+    }
+    return nest;
+  }
+
   init() {
-    this.result = {};
+    this.results = {};
     if (!this.validator) {
       this._invalidSet = new Set();
       return;
@@ -30,7 +39,7 @@ class FormState {
     for (const key of Object.keys(result.message)) {
       if (this.isEdit) {
         // 不记录校验成功的参数
-        this.result[key] = new vajs.Result({
+        this.results[key] = new vajs.Result({
           value: result.value[key],
           isValid: !result.message[key],
           message: result.message[key],
@@ -51,8 +60,8 @@ class FormState {
     }
 
     // 联合校验时，需要和嵌套结果同时进行判断
-    if (validationResult === undefined && this.result[name]) {
-      validationResult = this.result[name].nest;
+    if (validationResult === undefined && this.results[name]) {
+      validationResult = this.results[name].nest;
     }
 
     let result = new vajs.Result({
@@ -60,22 +69,24 @@ class FormState {
       isValid: true
     });
 
-    if (this.validator.get(name)) {
+    if (this.validator && this.validator.get(name)) {
       result = this.validator.validateOne(name, value, this);
     }
 
     if (validationResult) {
-      const isValid = result.isValid && validationResult.isValid;
-      if (isSingleResult(validationResult)) {
-        // 如果当前校验位成功，子校验为失败，使用子校验的错误信息
-        if (result.isValid && !validationResult.isValid) {
-          result.message = validationResult.message;
-        }
-      } else {
-        result.message = isValid ? '' : this.nestFailMessage;
-      }
       result.nest = validationResult;
-      result.isValid = isValid;
+      if (!validationResult.isValid) {
+        const isValid = result.isValid && validationResult.isValid;
+        if (isSingleResult(validationResult)) {
+          // 如果当前校验位成功，子校验为失败，使用子校验的错误信息
+          if (result.isValid && !validationResult.isValid) {
+            result.message = validationResult.message;
+          }
+        } else {
+          result.message = isValid ? '' : this.nestFailMessage;
+        }
+        result.isValid = isValid;
+      }
     }
 
     result.isValid
@@ -84,7 +95,7 @@ class FormState {
 
     // 数据更新后，记录校验成功的数据
     // 这样交互体验更好
-    this.result[name] = result;
+    this.results[name] = result;
     return result;
   }
 
@@ -101,7 +112,7 @@ class FormState {
 
   // 可用于进行关联数据更新
   update(name, value, validationResult) {
-    if (value === this.data[name]) return;
+    if (!(value && typeof value === 'object') && value === this.data[name]) return;
     this.data[name] = value;
     this.nameChanged = name;
     this.validateOne(name, value, validationResult);
@@ -113,5 +124,5 @@ module.exports = FormState;
 
 
 function isSingleResult(result) {
-  return result instanceof vajs.Result && typeof result.message === 'string'
+  return result instanceof vajs.Result && typeof result.message === 'string';
 }

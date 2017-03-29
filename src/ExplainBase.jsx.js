@@ -20,8 +20,15 @@ export default class ExplainBase extends FormChildComponent {
       type: PropTypes.string,
       message: PropTypes.string
     }),
-    // defaultExplain 是在 explain 不存在或者 explain.type === Explain.Types.SUCC 时使用
-    defaultExplain: PropTypes.object,
+    validResult: PropTypes.shape({
+      isValid: PropTypes.bool,
+      message: PropTypes.oneOfType([PropTypes.string, PropTypes.object])
+    }),
+    // defaultExplain 是在 validResult 不存在或者 validResult.isValid === true 时使用
+    defaultExplain: PropTypes.shape({
+      type: PropTypes.string,
+      message: PropTypes.string
+    }),
     children: PropTypes.oneOfType([
       PropTypes.arrayOf(PropTypes.node),
       PropTypes.node
@@ -30,7 +37,8 @@ export default class ExplainBase extends FormChildComponent {
 
   static defaultProps = {
     inline: false,
-    children: null
+    children: null,
+    defaultExplain: {}
   };
 
   /**
@@ -43,22 +51,16 @@ export default class ExplainBase extends FormChildComponent {
   }
 
   render() {
-    let {explain, inline, name, defaultExplain} = this.props;
+    const {inline, name, defaultExplain} = this.props;
+    let {validResult, explain} = this.props;
 
     if (name) {
-      explain = explain || this.formExplain;
+      validResult = validResult || this.formResult;
     }
 
-    if (!explain || !Object.keys(explain).length) {
-      explain = {...defaultExplain};
-    } else if (explain.type === Explain.Types.SUCC && !explain.message && defaultExplain) {
-      explain = {...defaultExplain};
-      explain.type = Explain.Types.SUCC;
-    }
+    explain = explain || formatValidResult(validResult, defaultExplain);
 
-    if (!explain) return null;
-
-    const {type} = explain || {};
+    const {type} = explain;
 
     let className = cx({
       'form-explain': true,
@@ -75,4 +77,26 @@ export default class ExplainBase extends FormChildComponent {
       </div>
     );
   }
+}
+
+
+function formatValidResult(validResult, defaultExplain) {
+  let explain;
+  if (!validResult) {
+    explain = {...defaultExplain};
+  } else if (validResult.isValid) {
+    explain = Explain.success(getMessage(validResult.message, defaultExplain.message || 'OK'));
+  } else {
+    explain = Explain.fail(getMessage(validResult.message, defaultExplain.message || '校验失败！'));
+  }
+  return explain;
+}
+
+
+function getMessage(message, defaultMessage) {
+  // vajs.map validate 后的结果的 message 是对象，这时候使用默认信息
+  if (message && typeof message === 'object') {
+    return defaultMessage;
+  }
+  return message || defaultMessage;
 }

@@ -1,5 +1,4 @@
 import {Component, PropTypes} from 'react';
-import Explain from './Explain';
 
 /**
  * FormChildComponent 表单元素组件的基类
@@ -10,10 +9,6 @@ export default class FormChildComponent extends Component {
     form: PropTypes.object
   };
 
-  static formatResult = formatResult;
-  static formatStateResult = formatStateResult;
-
-
   get form() {
     const {form} = this.context;
     return form || {};
@@ -23,8 +18,8 @@ export default class FormChildComponent extends Component {
     return this.form.data || {};
   }
 
-  get formExplains() {
-    return formatStateResult(this.form.result);
+  get formResults() {
+    return this.form.results;
   }
 
   get formValue() {
@@ -32,33 +27,13 @@ export default class FormChildComponent extends Component {
     return this.formData[name];
   }
 
-  get formExplain() {
+  get formResult() {
     const {name} = this.props; // eslint-disable-line react/prop-types
-    return formatResult(this.form.result[name]);
+    return this.form.results[name];
   }
 
   get formValidator() {
     const {name} = this.props; // eslint-disable-line react/prop-types
     return this.form.validator && this.form.validator.get(name);
   }
-}
-
-
-function formatStateResult(result) {
-  const explains = {};
-  for (const key of Object.keys(result)) {
-    explains[key] = formatResult(result[key]);
-  }
-  return explains;
-}
-
-
-function formatResult(result) {
-  if (result) {
-    if (result.isValid) {
-      return Explain.success('ok');
-    }
-    return Explain.fail(result.message);
-  }
-  return null;
 }

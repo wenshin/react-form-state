@@ -1,7 +1,7 @@
 import vajs from 'vajs';
 import React, {Component} from 'react';
 import ReactDOM from 'react-dom';
-import Form, {FormField, TextField, FormControl} from 'react-form-data';
+import Form, {FormState, FormField, TextField, FormControl, ExplainText} from 'react-form-data';
 
 import 'prismjs/themes/prism.css';
 import 'prismjs/themes/prism-okaidia.css';
@@ -13,49 +13,57 @@ window.addEventListener('load', function() {
 
 window.React = React;
 
-const validator = vajs.map({
-  name: vajs.string({maxLength: 5}),
-  nickname: vajs.string({maxLength: 2})
-});
-
 class App extends Component {
   constructor(props) {
     super(props);
-    this.state = {
-      normalForm: {
-        data: {
-          name: '',
-          nickname: '',
-        }
+    const self = this;
+    this.normalForm = new FormState({
+      data: {
+        name: 'test',
+        nickname: '',
       },
-      collectForm: {
-        data: {}
+      validator: vajs.map({
+        name: vajs.string({maxLength: 5}),
+        nickname: vajs.string({maxLength: 3})
+      }),
+      onStateChange(state) {
+        if (state.nameChanged === 'name') {
+          state.update('nickname', state.data.name.slice(0, 3));
+        }
+        self.forceUpdate();
       }
-    };
-  }
+    });
 
-  onNormalFormChange = (formState) => {
-    if (formState.nameChanged === 'name') {
-      formState.data.nickname = formState.data.name;
-    }
-    this.setState({normalForm: formState});
-  }
+    this.collectFormCtrlValidator = vajs.map({
+      foo1: vajs.number({max: 10})
+    });
 
-  onCollectFormChange = (formState) => {
-    this.setState({collectForm: formState});
+    this.collectForm = new FormState({
+      data: {},
+      validator: vajs.map({
+        collected: vajs.v((val) => {
+          const isValid = val.foo1 && val.foo2 && val.foo3;
+          if (!isValid) {
+            return new vajs.Result({value: val, isValid: false, message: '所有字段不能为空'});
+          }
+          return isValid;
+        })
+      }),
+      onStateChange(state) {
+        self.forceUpdate();
+      }
+    });
   }
 
   render() {
-    const {normalForm, collectForm} = this.state;
+    const collectedResults = this.collectForm.getNestResult('collected');
     return (
       <div>
         <article>
           <section>
             <h1>常规使用</h1>
             <Form
-              data={normalForm.data}
-              onDataChange={this.onNormalFormChange}
-              validator={validator}
+              state={this.normalForm}
             >
               <TextField
                 type='text'
@@ -74,7 +82,7 @@ class App extends Component {
               />
             </Form>
             <p>
-              {JSON.stringify(normalForm.data)}
+              {JSON.stringify(this.normalForm.data)}
             </p>
           </section>
           <section>
@@ -127,20 +135,27 @@ class FormPage extends Component {
           <section>
             <h1>用 FormControl 采集数据</h1>
             <Form
-              data={collectForm.data}
-              onDataChange={this.onCollectFormChange}
-              validator={validator}
+              state={this.collectForm}
             >
               <FormField name='collected'>
-                <FormControl>
-                  <label>foo1: <input name='foo1' /></label>
-                  <label>foo2: <input name='foo2' /></label>
-                  <label>foo3: <input name='foo3' /></label>
+                <FormControl validator={this.collectFormCtrlValidator}>
+                  <div>
+                    <label>foo1: <input name='foo1' /></label>
+                    <ExplainText validResult={collectedResults.foo1} />
+                  </div>
+                  <div>
+                    <label>foo2: <input name='foo2' /></label>
+                    <ExplainText validResult={collectedResults.foo2} />
+                  </div>
+                  <div>
+                    <label>foo3: <input name='foo3' /></label>
+                    <ExplainText validResult={collectedResults.foo3} />
+                  </div>
                 </FormControl>
               </FormField>
             </Form>
             <p>
-              {JSON.stringify(collectForm.data)}
+              {JSON.stringify(this.collectForm.data)}
             </p>
           </section>
         </article>

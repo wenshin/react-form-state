@@ -25,10 +25,13 @@ export default class ExplainBase extends FormChildComponent {
       message: PropTypes.oneOfType([PropTypes.string, PropTypes.object])
     }),
     // defaultExplain 是在 validResult 不存在或者 validResult.isValid === true 时使用
-    defaultExplain: PropTypes.shape({
-      type: PropTypes.string,
-      message: PropTypes.string
-    }),
+    defaultExplain: PropTypes.oneOfType([
+      PropTypes.shape({
+        type: PropTypes.string,
+        message: PropTypes.string
+      }),
+      PropTypes.string
+    ]),
     children: PropTypes.oneOfType([
       PropTypes.arrayOf(PropTypes.node),
       PropTypes.node
@@ -51,11 +54,15 @@ export default class ExplainBase extends FormChildComponent {
   }
 
   render() {
-    const {inline, name, defaultExplain} = this.props;
-    let {validResult, explain} = this.props;
+    const {inline, name} = this.props;
+    let {validResult, explain, defaultExplain} = this.props;
 
     if (name) {
       validResult = validResult || this.formResult;
+    }
+
+    if (typeof defaultExplain === 'string') {
+      defaultExplain = Explain.info(defaultExplain);
     }
 
     explain = explain || formatValidResult(validResult, defaultExplain);

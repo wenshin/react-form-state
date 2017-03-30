@@ -1,7 +1,6 @@
 import _omit from 'lodash/omit';
 import React, {PropTypes, Children, cloneElement} from 'react';
 // import HelpTips from './help-tip';
-import Explain from './Explain';
 import ExplainText from './ExplainText.jsx';
 import FormChildComponent from './FormChildComponent.jsx';
 
@@ -73,13 +72,10 @@ export default class FormField extends FormChildComponent {
       name,
       explain,
       isExplainShow,
-      isExplainInline
+      isExplainInline,
+      defaultExplain
     } = this.props;
-    let {defaultExplain} = this.props;
 
-    if (typeof defaultExplain === 'string') {
-      defaultExplain = Explain.info(defaultExplain);
-    }
     return isExplainShow ? (
       <ExplainText
         name={name}

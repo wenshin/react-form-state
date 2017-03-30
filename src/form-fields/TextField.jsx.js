@@ -15,6 +15,7 @@ export default class InputField extends FormField {
       />
     ) : (
       <input
+        type='text'
         value={value}
         onChange={loop}
         {...props}

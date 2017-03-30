@@ -78,11 +78,12 @@ class FormState {
       if (!validationResult.isValid) {
         const isValid = result.isValid && validationResult.isValid;
         if (isSingleResult(validationResult)) {
-          // 如果当前校验位成功，子校验为失败，使用子校验的错误信息
+          // 如果当前校验为成功，子校验为失败，使用子校验的错误信息
           if (result.isValid && !validationResult.isValid) {
             result.message = validationResult.message;
           }
-        } else {
+        } else if (result.isValid) {
+          // 如果当前校验失败，则使用当前校验的 message，如果当前校验成功则使用默认的嵌套失败信息
           result.message = isValid ? '' : this.nestFailMessage;
         }
         result.isValid = isValid;

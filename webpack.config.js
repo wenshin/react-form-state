@@ -45,7 +45,7 @@ const webpackConfig = {
     filename: FILENAME_TMPL + 'js',
     chunkFilename: FILENAME_TMPL.replace('hash', 'chunkhash') + 'js',
     // NOTE: 必须是绝对路径
-    path: path.resolve(BUILD_EXAMPLES_PATH),
+    path: path.join(path.resolve(BUILD_EXAMPLES_PATH), STATIC_URL),
     publicPath: STATIC_URL,
   },
 

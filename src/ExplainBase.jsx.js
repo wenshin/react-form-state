@@ -1,6 +1,6 @@
 import {PropTypes} from 'react';
 import cx from 'classnames';
-import FormChildComponent from './FormChildComponent.jsx';
+import FormChild from './FormChild.jsx';
 import Explain from './Explain';
 
 /**
@@ -12,7 +12,7 @@ import Explain from './Explain';
  *
  *    <ExplainBase name='test' defaultExplain inline />
  */
-export default class ExplainBase extends FormChildComponent {
+export default class ExplainBase extends FormChild {
   static propTypes = {
     name: PropTypes.string,
     inline: PropTypes.bool,
@@ -93,6 +93,8 @@ function formatValidResult(validResult, defaultExplain) {
     explain = {...defaultExplain};
   } else if (validResult.isValid) {
     explain = Explain.success(getMessage(validResult.message, defaultExplain.message || 'OK'));
+  } else if (validResult.pending) {
+    explain = Explain.pending(getMessage(validResult.message, '校验中...'));
   } else {
     explain = Explain.fail(getMessage(validResult.message, defaultExplain.message || '校验失败！'));
   }

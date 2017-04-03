@@ -3,7 +3,7 @@ import {fireEvent, isInputEventSupported} from './event';
 import FormState from './FormState';
 
 import DataSet from './DataSet.jsx';
-import FormChildComponent from './FormChildComponent.jsx';
+import FormChild from './FormChild.jsx';
 
 /**
  * 用法：
@@ -38,7 +38,7 @@ import FormChildComponent from './FormChildComponent.jsx';
  *
  * ```
  */
-export default class FormControl extends FormChildComponent {
+export default class FormControl extends FormChild {
   static propTypes = {
     name: PropTypes.string,
     // 设置 defaultValue 表示把组件声明成 uncontrolled 组件

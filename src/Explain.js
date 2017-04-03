@@ -1,5 +1,5 @@
 export default class Explain {
-  static Types = {ERROR: 'error', WARN: 'warn', SUCC: 'success', INFO: 'info'};
+  static Types = {ERROR: 'error', WARN: 'warn', SUCC: 'success', INFO: 'info', PENDING: 'pending'};
 
   /**
    * Explain 对象工厂函数
@@ -42,6 +42,10 @@ export default class Explain {
 
   static info = (message) => {
     return Explain.explain(message, Explain.Types.INFO);
+  };
+
+  static pending = (message) => {
+    return Explain.explain(message, Explain.Types.PENDING);
   };
 
   constructor(type, message) {

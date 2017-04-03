@@ -10,7 +10,7 @@ import ExplainBase from './ExplainBase.jsx';
 import ExplainText from './ExplainText.jsx';
 import FormField from './FormField.jsx';
 import FormControl from './FormControl.jsx';
-import FormChildComponent from './FormChildComponent.jsx';
+import FormChild from './FormChild.jsx';
 import TextField from './form-fields/TextField.jsx';
 
 
@@ -101,7 +101,7 @@ export default class Form extends DataSet {
   }
 }
 
-export class FormGroup extends FormChildComponent {
+export class FormGroup extends FormChild {
   render() {
     const {title, children} = this.props;
     return (
@@ -134,6 +134,6 @@ export {
   FormState,
   TextField,
   FormControl,
-  FormChildComponent,
+  FormChild,
   HelpTips
 };

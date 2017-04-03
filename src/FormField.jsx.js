@@ -2,11 +2,11 @@ import _omit from 'lodash/omit';
 import React, {PropTypes, Children, cloneElement} from 'react';
 // import HelpTips from './help-tip';
 import ExplainText from './ExplainText.jsx';
-import FormChildComponent from './FormChildComponent.jsx';
+import FormChild from './FormChild.jsx';
 
 const loop = () => {};
 
-export default class FormField extends FormChildComponent {
+export default class FormField extends FormChild {
   static propTypes = {
     label: PropTypes.oneOfType([PropTypes.string, PropTypes.element]),
     labelTip: PropTypes.string,
@@ -29,7 +29,11 @@ export default class FormField extends FormChildComponent {
       })
     ]),
     required: PropTypes.bool,
-    children: PropTypes.element,
+    children: PropTypes.oneOfType([
+      PropTypes.string,
+      PropTypes.element,
+      PropTypes.array
+    ]),
     show: PropTypes.bool,
   };
 
@@ -92,7 +96,7 @@ export default class FormField extends FormChildComponent {
     let newChildren = children;
     // 默认如果只有一个子元素，自动会给子元素新增 value
     // 注意 input，textarea 等内置元素，动态添加 props，React 15 加了一些警告提示
-    if (Children.count(children) === 1) {
+    if (Children.count(children) === 1 && typeof children === 'object') {
       const props = this.formValue === undefined ? {} : {value: this.formValue};
       props.onChange = children.props.onChange || loop;
 

@@ -1,10 +1,10 @@
 import {Component, PropTypes} from 'react';
 
 /**
- * FormChildComponent 表单元素组件的基类
- * 提供 context 初始化，以及获取表单状态函数
+ * FormChild 表单元素组件的基类
+ * 提供 context 初始化，以及获取表单状态数据
  */
-export default class FormChildComponent extends Component {
+export default class FormChild extends Component {
   static contextTypes = {
     form: PropTypes.object
   };
@@ -30,6 +30,11 @@ export default class FormChildComponent extends Component {
   get formResult() {
     const {name} = this.props; // eslint-disable-line react/prop-types
     return this.form.results[name];
+  }
+
+  get formNestResult() {
+    const {name} = this.props; // eslint-disable-line react/prop-types
+    return this.form.getNestResult(name);
   }
 
   get formValidator() {

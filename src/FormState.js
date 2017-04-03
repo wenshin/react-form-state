@@ -5,6 +5,7 @@ class FormState {
     this.data = options.data || {};
     this.validator = options.validator;
     this.onStateChange = options.onStateChange;
+    this.onUnhandledRejection = options.onUnhandledRejection;
     // 如果不是 edit 模式，那么首次数据校验错误信息不会存到 this.results 中
     // 这样新建默认不会显示很多必填的错误显示
     this.isEdit = options.isEdit;
@@ -29,30 +30,72 @@ class FormState {
 
   init() {
     this.results = {};
-    if (!this.validator) {
-      this._invalidSet = new Set();
-      return;
-    }
+    this._invalidSet = new Set();
 
-    const result = this.validator.validate(this.data, this);
-    this._invalidSet = new Set(Object.keys(result.message));
-    for (const key of Object.keys(result.message)) {
-      if (this.isEdit) {
-        // 不记录校验成功的参数
-        this.results[key] = new vajs.Result({
-          value: result.value[key],
-          isValid: !result.message[key],
-          message: result.message[key],
-          transformed: result.transformed[key]
-        });
-      } else {
+    if (!this.validator) return;
+
+    const mapResult = this.validator.validate(this.data, this);
+    for (const name of Object.keys(mapResult.results)) {
+      const result = mapResult.results[name];
+      if (!result.isValid) {
+        if (this.isEdit) {
+          // 不记录校验成功的参数
+          this.results[name] = result;
+        }
+        if (result.promise) {
+          this._dealInitResultPromise(name, result);
+        }
         // 不记录任何校验信息，只是的 isValid 生效
-        this._invalidSet.add(key);
+        this._invalidSet.add(name);
       }
     }
   }
 
-  // 可用于联合校验
+  _dealInitResultPromise(name, result) {
+    result
+      .promise
+      .then((res) => {
+        if (this.isEdit) {
+          this.results[name] = res;
+        } else if (res.isValid) {
+          this._invalidSet.delete(name);
+        } else {
+          this._invalidSet.add(name);
+        }
+        this._triggerStateChange();
+      })
+      .catch(err => this._onUnhandledRejection(err, name, result.value));
+  }
+
+  /**
+   * [update description]
+   * @param  {String}      name
+   * @param  {any}         value
+   * @param  {vajs.Result} validationResult 自带校验结果
+   */
+  updateState(name, value, validationResult) {
+    const result = this.update(name, value, validationResult);
+    if (result.promise) {
+      result
+        .promise
+        .then(() => this._triggerStateChange());
+    }
+    this._triggerStateChange();
+  }
+
+  _triggerStateChange() {
+    this.onStateChange && this.onStateChange(this);
+  }
+
+  // 可用于进行关联数据更新
+  update(name, value, validationResult) {
+    if (!(value && typeof value === 'object') && value === this.data[name]) return null;
+    this.data[name] = value;
+    this.nameChanged = name;
+    return this.validateOne(name, value, validationResult);
+  }
+
+   // 可用于联合校验
   // this.validateOne(name) 可以根据现有数据进行校验
   validateOne(name, value, validationResult) {
     if (value === undefined) {
@@ -64,15 +107,21 @@ class FormState {
       validationResult = this.results[name].nest;
     }
 
-    let result = new vajs.Result({
-      value,
-      isValid: true
-    });
+    let result = new vajs.Result({value});
 
     if (this.validator && this.validator.get(name)) {
       result = this.validator.validateOne(name, value, this);
+      if (result.promise) {
+        result.promise = result
+          .promise
+          .then(res => this._mergeResult(name, res, validationResult))
+          .catch(err => this._onUnhandledRejection(err, name, result.value));
+      }
     }
+    return this._mergeResult(name, result, validationResult);
+  }
 
+  _mergeResult(name, result, validationResult) {
     if (validationResult) {
       result.nest = validationResult;
       if (!validationResult.isValid) {
@@ -100,23 +149,10 @@ class FormState {
     return result;
   }
 
-  /**
-   * [update description]
-   * @param  {String}      name
-   * @param  {any}         value
-   * @param  {vajs.Result} validationResult 自带校验结果
-   */
-  updateState(name, value, validationResult) {
-    this.update(name, value, validationResult);
-    this.onStateChange && this.onStateChange(this);
-  }
-
-  // 可用于进行关联数据更新
-  update(name, value, validationResult) {
-    if (!(value && typeof value === 'object') && value === this.data[name]) return;
-    this.data[name] = value;
-    this.nameChanged = name;
-    this.validateOne(name, value, validationResult);
+  _onUnhandledRejection(err, name, value) {
+    err.name = name;
+    err.value = value;
+    this.onUnhandledRejection && this.onUnhandledRejection(err);
   }
 }
 

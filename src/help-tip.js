@@ -1,6 +1,6 @@
-import FormChildComponent from './FormChildComponent.jsx';
+import FormChild from './FormChild.jsx';
 
-export default class HelpTips extends FormChildComponent {
+export default class HelpTips extends FormChild {
   render() {
     const {
       tip,

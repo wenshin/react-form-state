@@ -17,18 +17,24 @@ class UnionUpdateForm extends Component {
         <p>当表单中的某个字段依赖另外一个字段的时候，我们需要联合更新该字段并进行校验</p>
         <Form state={this.formState}>
           <TextField
-            type='text'
-            label='Name'
+            label='姓名'
             name='name'
-            defaultExplain='请输入最多5个字符的名称'
+            defaultExplain='请输入最多5个字符，且不能和父亲姓名一样'
             required
           />
           <TextField
             type='textarea'
-            label='Nick Name'
+            label='昵称'
             name='nickname'
             isExplainInline={false}
-            defaultExplain='请输入最多3个字符的名称'
+            defaultExplain='请输入最多3个字符'
+            required
+          />
+          <TextField
+            label='父亲姓名'
+            name='fathername'
+            isExplainInline={false}
+            defaultExplain='请输入最多5个字符，且不能和子女姓名一样'
             required
           />
           <FormFooterField />
@@ -40,15 +46,30 @@ class UnionUpdateForm extends Component {
 
 export default UnionUpdateForm;
 
+
+const nameValidator = vajs.string({maxLength: 5});
 function createFormState(onStateChange) {
   return new FormState({
     data: {
-      name: 'test',
+      name: 'name',
       nickname: '',
     },
     validator: vajs.map({
-      name: vajs.string({maxLength: 5}),
-      nickname: vajs.string({maxLength: 3})
+      name: vajs.v((val, state) => {
+        let result = nameValidator.validate(val);
+        if (result.isValid && state.data.fathername === val) {
+          result = new vajs.Result({isValid: false, message: '不能和父亲名字一样'});
+        }
+        return result;
+      }),
+      nickname: vajs.string({maxLength: 3}),
+      fathername: vajs.v((val, state) => {
+        let result = nameValidator.validate(val);
+        if (result.isValid && state.data.name === val) {
+          result = new vajs.Result({isValid: false, message: '不能和子女名字一样'});
+        }
+        return result;
+      })
     }),
     onStateChange(state) {
       if (state.nameChanged === 'name') {

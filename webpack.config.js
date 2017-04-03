@@ -65,6 +65,9 @@ const webpackConfig = {
       modules: false,
       colors: true
     },
+    proxy: {
+      '/': 'http://127.0.0.1:8080/static/'
+    },
     // 可通过 IP 地址访问
     host: '0.0.0.0'
   },
@@ -75,10 +78,14 @@ const webpackConfig = {
       {
         test: /\.(es6|js|jsx|jsx\.js)$/,
         exclude: /(dist|vendor|node_modules|min\.js)/,
-        loader: 'babel-loader',
-        options: {
-          cacheDirectory: '/tmp/'
-        }
+        use: [{
+          loader: 'babelsrc-loader'
+        }, {
+          loader: 'babel-loader',
+          options: {
+            cacheDirectory: '/tmp/'
+          }
+        }],
       }, {
         test: /\.less$/,
         use: [{
@@ -113,7 +120,7 @@ const webpackConfig = {
    * 通过resolveLoader.root更改loader的寻找路径
    */
   resolveLoader: {
-    modules: ['node_modules']
+    modules: ['webpack-loaders', 'node_modules']
   }
 };
 
@@ -122,7 +129,7 @@ if (!isBuild) {
   // 但是这会导致刷新页面中断无效，影响调试
   // Chrome 升级49+ 后会导致 cheap-module-source-map 失效
   // https://github.com/webpack/webpack/issues/2145
-  webpackConfig.devtool = '#cheap-module-inline-source-map';
+  webpackConfig.devtool = '#module-source-map';
 }
 
 module.exports = webpackConfig;

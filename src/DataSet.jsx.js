@@ -20,19 +20,18 @@ export default class DataSet extends Component {
     }
   }
 
-  renderSubDataSet() {
-    return null;
+  renderChildren() {
+    return this.props.children;
   }
 
   render() {
-    const {children} = this.props;
-    const subDataSet = this.renderSubDataSet();
+    const children = this.renderChildren();
     return (
       <div
         onChange={this.onChange}
         className='data-set'
       >
-        {subDataSet || children}
+        {children}
       </div>
     );
   }

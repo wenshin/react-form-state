@@ -1,6 +1,5 @@
 import _omit from 'lodash/omit';
 import React, {PropTypes, Children, cloneElement} from 'react';
-// import HelpTips from './help-tip';
 import ExplainText from './ExplainText.jsx';
 import FormChild from './FormChild.jsx';
 
@@ -62,11 +61,6 @@ export default class FormField extends FormChild {
       <label htmlFor={name} className='form-label'>
         {required ? <span className='form-field__required'>*</span> : null}
         {typeof label === 'string' ? <span dangerouslySetInnerHTML={{__html: label}} /> : label}
-        {/* 这里使用隐藏，是为了保持左边对齐 */}
-        {/*labelTip
-          ? <HoverTip text={labelTip} position={labelTipPlace} theme={labelTheme} />
-          : <span style={{width: '21px', height: '10px', display: 'inline-block'}} />
-        */}
       </label>
     ) : null;
   }

@@ -1,6 +1,6 @@
 const vajs = require('vajs');
 const assert = require('assert');
-const FormState = require('../src/FormState');
+const FormState = require(`../${process.env.NODE_LIB || 'src'}/FormState`);
 
 
 describe('FormState', () => {
@@ -179,7 +179,6 @@ describe('FormState', () => {
         })
       })
     });
-
   });
 
   it('async validation handle error', (done) => {

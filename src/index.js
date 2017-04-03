@@ -1,11 +1,9 @@
 import {PropTypes} from 'react';
-import ReactTooltip from 'react-tooltip';
 
 import Explain from './Explain';
 import FormState from './FormState';
 
 import DataSet from './DataSet.jsx';
-import HelpTips from './help-tip';
 import ExplainBase from './ExplainBase.jsx';
 import ExplainText from './ExplainText.jsx';
 import FormField from './FormField.jsx';
@@ -90,12 +88,11 @@ export default class Form extends DataSet {
     return {form: this.props.state};
   }
 
-  renderSubDataSet() {
+  renderChildren() {
     const {className, children} = this.props;
     return (
       <div className={`form ${className || ''}`}>
         {children}
-        <ReactTooltip multiline />
       </div>
     );
   }
@@ -134,6 +131,5 @@ export {
   FormState,
   TextField,
   FormControl,
-  FormChild,
-  HelpTips
+  FormChild
 };

@@ -18,6 +18,10 @@ A powerful react form support union validation and nest validation.
 
 ## Releases
 
+**0.0.2**
+
+- Fix React 0.14.x compatible bug
+
 **0.0.1**
 
 - first release

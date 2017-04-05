@@ -1,11 +1,12 @@
 {
-  "name": "react-form-state",
-  "version": "1.0.0",
+  "name": "@myfe/react-form-state",
+  "version": "0.0.1",
   "keywords": [
     "react",
-    "form"
+    "form",
+    "mt-component"
   ],
-  "description": "react form with data collector by onChange bubble",
+  "description": "A powerful react form support union validation and nest validation",
   "repository": "",
   "main": "dist/index.js",
   "files": [
@@ -17,9 +18,8 @@
   "scripts": {
     "predocs-build": "rm -r build/examples || echo 'no build/examples'",
     "docs-build": "webpack -p --progress",
-    "postdocs-build": "mv build/examples/static/index.html build/examples/",
     "docs-server": "webpack-dev-server --hot --inline --progress",
-    "dist": "babel src -d dist",
+    "dist": "babel src -d dist && lessc src/style.less dist/style.css",
     "prepublish": "npm run dist && NODE_LIB=dist mocha test && npm run docs-build"
   },
   "author": "yuanwen",

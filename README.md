@@ -1,1 +1,23 @@
-react-form-state
+## react-form-state
+
+A powerful react form support union validation and nest validation.
+
+## Features
+
+1. ui and data separation
+2. custom form control
+3. collect data into object
+4. union validation
+5. collect data with onChange bubble
+
+
+## docs
+
+    npm i
+    npm run docs-server
+
+## Releases
+
+**0.0.1**
+
+- first release

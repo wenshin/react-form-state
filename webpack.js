@@ -1,2 +1,2 @@
-require('./src/style.css');
+require('./dist/style.css');
 module.exports = require('./dist');

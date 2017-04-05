@@ -109,7 +109,7 @@ const webpackConfig = {
   // resolve主要配置 require 模块时的模块查找相关功能
   resolve: {
     alias: {
-      [pkg.name]: path.resolve(SRC_PATH)
+      'react-form-state': path.resolve(SRC_PATH)
     },
     // 配置模块的根目录，可以是数组。NOTE: 必须是绝对路径
     modules: ['node_modules']

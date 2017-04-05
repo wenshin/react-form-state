@@ -1,6 +1,6 @@
 import vajs from 'vajs';
 import {Component} from 'react';
-import Form, {FormState, TextField} from 'react-form-state';
+import Form, {FormState, InputField} from 'react-form-state';
 import FormFooterField from '../FormFooterField.jsx';
 
 class UnionUpdateForm extends Component {
@@ -16,13 +16,13 @@ class UnionUpdateForm extends Component {
       <section>
         <p>当表单中的某个字段依赖另外一个字段的时候，我们需要联合更新该字段并进行校验</p>
         <Form state={this.formState}>
-          <TextField
+          <InputField
             label='姓名'
             name='name'
             defaultExplain='请输入最多5个字符，且不能和父亲姓名一样'
             required
           />
-          <TextField
+          <InputField
             type='textarea'
             label='昵称'
             name='nickname'
@@ -30,7 +30,7 @@ class UnionUpdateForm extends Component {
             defaultExplain='请输入最多3个字符'
             required
           />
-          <TextField
+          <InputField
             label='父亲姓名'
             name='fathername'
             isExplainInline={false}

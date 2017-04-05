@@ -1,6 +1,6 @@
 import vajs from 'vajs';
 import {Component} from 'react';
-import Form, {FormState, TextField} from 'react-form-state';
+import Form, {FormState, InputField} from 'react-form-state';
 import FormFooterField from '../FormFooterField.jsx';
 
 class AsyncValidationForm extends Component {
@@ -16,7 +16,7 @@ class AsyncValidationForm extends Component {
       <section>
         <p>表单中实现异步校验</p>
         <Form state={this.formState}>
-          <TextField
+          <InputField
             type='text'
             label='异步校验'
             name='async'

@@ -9,7 +9,7 @@ import ExplainText from './ExplainText.jsx';
 import FormField from './FormField.jsx';
 import FormControl from './FormControl.jsx';
 import FormChild from './FormChild.jsx';
-import TextField from './form-fields/TextField.jsx';
+import InputField from './form-fields/InputField.jsx';
 
 
 /**
@@ -129,7 +129,7 @@ export {
   ExplainText,
   FormField,
   FormState,
-  TextField,
+  InputField,
   FormControl,
   FormChild
 };

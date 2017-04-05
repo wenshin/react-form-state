@@ -169,7 +169,7 @@ FormControl，FormField，ExplainBase 等组件均是 FormChild 的子类。
 ## FormControl
 FormControl 有两种模式，一种是搜集数据模式，一种是自定义表单控件模式。详细见 FormControl 的相关实例
 
-## FormField、TextField
+## FormField、InputField
 详细见实例
 
 ## ExplainBase、ExplainText 校验结果解释

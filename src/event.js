@@ -1,4 +1,4 @@
-import isEventSupported from 'react-dom/lib/isEventSupported';
+import isEventSupported from './lib/isEventSupported';
 /**
  * trigger a DOM event via script
  * Reference From http://darktalker.com/2010/07/manually-trigger-dom-event/

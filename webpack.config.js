@@ -45,8 +45,10 @@ const webpackConfig = {
     filename: FILENAME_TMPL + 'js',
     chunkFilename: FILENAME_TMPL.replace('hash', 'chunkhash') + 'js',
     // NOTE: 必须是绝对路径
-    path: path.join(path.resolve(BUILD_EXAMPLES_PATH), STATIC_URL),
-    publicPath: STATIC_URL,
+    // path: path.join(path.resolve(BUILD_EXAMPLES_PATH), STATIC_URL),
+    path: path.resolve(BUILD_EXAMPLES_PATH),
+    // 在 index.html 中的静态文件使用相对地址
+    // publicPath: STATIC_URL,
   },
 
   devServer: {
@@ -54,7 +56,7 @@ const webpackConfig = {
     compress: true,
     port: 8080,
     // NOTE devServer.publicPath 必须和 output.publicPath 一致
-    publicPath: STATIC_URL,
+    // publicPath: STATIC_URL,
     hot: true,
     // 不显示太多的提示信息
     // quiet: true,
@@ -64,9 +66,6 @@ const webpackConfig = {
       children: false,
       modules: false,
       colors: true
-    },
-    proxy: {
-      '/': 'http://127.0.0.1:8080/static/'
     },
     // 可通过 IP 地址访问
     host: '0.0.0.0'

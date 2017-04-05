@@ -25,6 +25,9 @@ function App() {
     <article>
       <section>
         <Markdown>{`
+# react form state
+是一个数据与 UI 分离，支持丰富的校验场景，支持轻松扩展的表单控件。
+
 # 设计哲学
 ### UI 和 Form 数据处理逻辑分离
 当表单存在复杂的校验，各个元素之间存在复杂的联合更新和联合校验时，

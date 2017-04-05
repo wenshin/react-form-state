@@ -48,6 +48,16 @@ function App() {
       <section>
         <h1>使用指南</h1>
         <section>
+          <Markdown>{`
+### 引入文件
+同时引入 js 和 css。
+
+- import Form from '@myfe/react-form-state';
+- <link rel="stylesheet" href="path/to/@myfe/react-form-state/style.css"></link>
+- import Form from '@myfe/react-form-state/webpack' 当你使用 webpakc，会自动引入 style.css
+          `}</Markdown>
+        </section>
+        <section>
           <h3>联合更新和校验</h3>
           <UnionUpdateForm />
           <section>

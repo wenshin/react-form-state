@@ -112,12 +112,15 @@ function App() {
       <section>
         <Markdown>{`
 # API
-reat-form-state 依赖 [vajs](https://github.com/wenshin/vajs)
+reat-form-state 依赖 [vajs](https://github.com/wenshin/vajs)，
 
 ## FormState
 FormState 是一个纯 JS 类，负责处理表单状态变化。
 FormState 实例化时会执行一次全量的校验，但是并不会把结果存储到 result 中。
 这样可以实现表单首次没有错误显示。
+
+### FormState.va
+访问 vajs
 
 ### FormState.constructor({isEdit, data, validator, nestFailMessage, onStateChange})
 

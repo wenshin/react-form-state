@@ -1,8 +1,9 @@
-import vajs from 'vajs';
 import {Component} from 'react';
 import Form, {FormState, FormField, FormControl} from 'react-form-state';
 import FormFooterField from '../FormFooterField.jsx';
 import Markdown from '../Markdown.jsx';
+
+const vajs = FormState.va;
 
 function MyComponent(props) {
   return (

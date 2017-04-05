@@ -157,6 +157,8 @@ class FormState {
 }
 
 
+FormState.va = vajs;
+
 module.exports = FormState;
 
 

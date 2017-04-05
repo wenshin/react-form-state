@@ -1,8 +1,9 @@
-import vajs from 'vajs';
 import {Component} from 'react';
 import Form, {FormState, FormField, FormControl, ExplainText} from 'react-form-state';
 import FormFooterField from '../FormFooterField.jsx';
 import Markdown from '../Markdown.jsx';
+
+const vajs = FormState.va;
 
 class MyFormControl extends FormControl {
   _validator = vajs.map({

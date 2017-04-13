@@ -3,7 +3,7 @@ import Form, {FormState, FormField, FormControl, ExplainText} from 'react-form-s
 import FormFooterField from '../FormFooterField.jsx';
 import Markdown from '../Markdown.jsx';
 
-const vajs = FormState.va;
+const vajs = FormState.vajs;
 
 const formCtrlValidator = vajs.map({
   foo1: vajs.number({max: 10})

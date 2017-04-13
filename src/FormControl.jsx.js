@@ -72,10 +72,10 @@ export default class FormControl extends FormChild {
   }
 
   get result() {
-    if (!this.validator) {
-      return this.formResult;
-    } else if (this._isCollectData) {
+    if (this._isCollectData) {
       return this.dataSetState.results;
+    } else if (!this.validator) {
+      return this.formResult;
     }
     return this._result;
   }

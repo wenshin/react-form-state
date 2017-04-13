@@ -16,6 +16,10 @@ export default class FormField extends FormChild {
     isExplainShow: PropTypes.bool,
     // false，提示框非 inline 模式
     isExplainInline: PropTypes.bool,
+    validResult: PropTypes.shape({
+      isValid: PropTypes.bool,
+      message: PropTypes.oneOfType([PropTypes.string, PropTypes.object])
+    }),
     explain: PropTypes.shape({
       type: PropTypes.string,
       message: PropTypes.string
@@ -69,6 +73,7 @@ export default class FormField extends FormChild {
     const {
       name,
       explain,
+      validResult,
       isExplainShow,
       isExplainInline,
       defaultExplain
@@ -78,6 +83,7 @@ export default class FormField extends FormChild {
       <ExplainText
         name={name}
         inline={isExplainInline}
+        validResult={validResult || this.formResult}
         explain={explain}
         defaultExplain={defaultExplain}
       />
@@ -108,9 +114,7 @@ export default class FormField extends FormChild {
     return (
       <div className={'form-field ' + className} style={{display: show ? '' : 'none'}}>
         {this.renderLabel()}
-
         {this.renderField()}
-
         {this.renderExplain()}
       </div>
     );

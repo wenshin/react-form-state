@@ -2,7 +2,7 @@ import {Component} from 'react';
 import Form, {FormState, InputField} from 'react-form-state';
 import FormFooterField from '../FormFooterField.jsx';
 
-const vajs = FormState.va;
+const vajs = FormState.vajs;
 
 class AsyncValidationForm extends Component {
   constructor(props) {

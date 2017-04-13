@@ -41,3 +41,10 @@ button:disabled {
   color: #999;
   cursor: default;
 }
+
+code.codespan {
+  border-radius: 3px;
+  padding: 2px 5px;
+  background: #f1e4e4;
+  color: #c00;
+}

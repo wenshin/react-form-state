@@ -1,11 +1,14 @@
 import React from 'react';
 import ReactDOM from 'react-dom';
-import Markdown from './Markdown.jsx';
+import {InputField} from 'react-form-state';
+import Markdown, {Code} from './Markdown.jsx';
 import UnionUpdateForm from './normal/UnionUpdateForm.jsx';
 import AsyncValidationForm from './normal/AsyncValidationForm.jsx';
 import CollectForm from './form-control/CollectForm.jsx';
 import CustomCollectForm from './form-control/CustomCollectForm.jsx';
 import CustomFormControlForm from './form-control/CustomFormControlForm.jsx';
+import FormFieldDisabledForm from './form-field/FormFieldDisabledForm.jsx';
+import FormFooterField from './FormFooterField.jsx';
 
 import './markdown.css';
 import './markdown-theme5.css';
@@ -13,10 +16,6 @@ import 'prismjs/themes/prism.css';
 import 'prismjs/themes/prism-okaidia.css';
 import 'react-form-state/style.less';
 import './style.css';
-
-window.addEventListener('load', () => {
-  require(['prismjs', 'prismjs/components/prism-jsx']);
-});
 
 window.React = React;
 
@@ -52,29 +51,32 @@ function App() {
 ### 引入文件
 同时引入 js 和 css。
 
-- import Form from '@myfe/react-form-state';
-- <link rel="stylesheet" href="path/to/@myfe/react-form-state/style.css"></link>
-- import Form from '@myfe/react-form-state/webpack' 当你使用 webpakc，会自动引入 style.css
+- \`import Form from '@myfe/react-form-state'\`
+- \`<link rel="stylesheet" href="path/to/@myfe/react-form-state/style.css"></link>\`
+- \`import Form from '@myfe/react-form-state/webpack' 当你使用 webpakc，会自动引入 style.css\`
           `}</Markdown>
         </section>
+
         <section>
           <h3>联合更新和校验</h3>
           <UnionUpdateForm />
           <section>
-            <pre>
-              <code className='language-jsx'>{UnionUpdateForm.srcContent}</code>
-            </pre>
+            <Code lang='jsx' code={UnionUpdateForm.srcContent} />
+          </section>
+          <section>
+            <h4>FormFooterField</h4>
+            <Code lang='jsx' code={FormFooterField.srcContent} />
           </section>
         </section>
+
         <section>
           <h3>服务器端校验</h3>
           <AsyncValidationForm />
           <section>
-            <pre>
-              <code className='language-jsx'>{AsyncValidationForm.srcContent}</code>
-            </pre>
+            <Code lang='jsx' code={AsyncValidationForm.srcContent} />
           </section>
         </section>
+
         <section>
           <Markdown>{`
 ### FormControl 表单元素
@@ -84,28 +86,37 @@ function App() {
             <h4>用 FormControl 采集数据</h4>
             <CollectForm />
             <section>
-              <pre>
-                <code className='language-jsx'>{CollectForm.srcContent}</code>
-              </pre>
+              <Code lang='jsx' code={CollectForm.srcContent} />
             </section>
           </section>
           <section>
             <h4>继承 FormControl 封装采集数据</h4>
             <CustomCollectForm />
             <section>
-              <pre>
-                <code className='language-jsx'>{CustomCollectForm.srcContent}</code>
-              </pre>
+              <Code lang='jsx' code={CustomCollectForm.srcContent} />
             </section>
           </section>
           <section>
             <h4>继承 FormControl 自定义表单元素</h4>
             <CustomFormControlForm />
             <section>
-              <pre>
-                <code className='language-jsx'>{CustomFormControlForm.srcContent}</code>
-              </pre>
+              <Code lang='jsx' code={CustomFormControlForm.srcContent} />
             </section>
+          </section>
+        </section>
+
+        <section>
+          <h4>继承 FormField</h4>
+          <p>可以通过继承 FormField 并重写 renderLable, renderField, renderExplain 三个方法自定义 FormField</p>
+          <section>
+            <Code lang='jsx' code={InputField.srcContent} />
+          </section>
+        </section>
+        <section>
+          <h4>禁用 FormField</h4>
+          <FormFieldDisabledForm />
+          <section>
+            <Code lang='jsx' code={FormFieldDisabledForm.srcContent} />
           </section>
         </section>
       </section>
@@ -119,30 +130,36 @@ FormState 是一个纯 JS 类，负责处理表单状态变化。
 FormState 实例化时会执行一次全量的校验，但是并不会把结果存储到 result 中。
 这样可以实现表单首次没有错误显示。
 
-### FormState.va
-访问 vajs
+### FormState.vajs
+类属性
 
-### FormState.constructor({isEdit, data, validator, nestFailMessage, onStateChange})
+### formState.isValid
+实例属性，Boolean 类型，true 表示表单当前校验通过
+
+### formState.results
+实例属性，Object，与 data 结构一致的校验结果集合
+
+### formState.constructor({isEdit, data, validator, nestFailMessage, onStateChange})
 
 - **data**，表单初始化数据
 - **validator**，vajs.ValidatorMap 实例
 - **nestFailMessage** 当执行嵌套校验时的
 
-### FormState.updateState(name, value, validationResult)
+### formState.updateState(name, value, validationResult)
 更新数据和校验，并触发 onStateChange 方法
 
 - **name**，表单初始化数据
 - **value**，vajs.ValidatorMap 实例
 - **validationResult**，存在嵌套校验结果需要同时判断
 
-### FormState.update(name, value, validationResult)
+### formState.update(name, value, validationResult)
 只是更新数据和校验，适合用于联合更新数据
 
 - **name**，表单初始化数据
 - **value**，vajs.ValidatorMap 实例
 - **validationResult**，存在嵌套校验结果需要同时判断
 
-### FormState.validateOne(name, value, validationResult)
+### formState.validateOne(name, value, validationResult)
 校验指定数据，适合用于数据不更新只是校验
 
 - **name**，表单初始化数据
@@ -150,33 +167,34 @@ FormState 实例化时会执行一次全量的校验，但是并不会把结果�
 - **validationResult**，存在嵌套校验结果需要同时判断
 
 ## DataSet
-DataSet 实现了监听 onChange 事件冒泡的逻辑，调用 props.state.updateState 进行数据更新
+DataSet 实现了监听 onChange 事件冒泡的逻辑，调用 props.state.updateState 进行数据更新。
+是用于实现 Form 和 FormControl 搜集数据功能的核心功能。
 
 ## Form
-Form 组件是搜集整个表单的数据的根节点。props.state 必须是 FormState 实例。
+Form 组件是搜集整个表单的数据的根节点。props.state 必须是 FormState 实例。继承自 DataSet 类
 
 ## FormChild
 FormChild 初始化了 Form 组件的 context 属性，
 如果继承 FormChild 即可得到获取 Form 数据的方法。
 FormControl，FormField，ExplainBase 等组件均是 FormChild 的子类。
 
-### FormChild.form
-获取 Form 组件的 FormState 实例
+### formChild.form
+实例属性，获取 Form 组件的 FormState 实例
 
-### FormChild.formData
-获取 FormState 实例的 data 属性
+### formChild.formData
+实例属性，获取 FormState 实例的 data 属性
 
-### FormChild.formResults
-获取 FormState 实例的 results 属性
+### formChild.formResults
+实例属性，获取 FormState 实例的 results 属性
 
-### FormChild.formValue
-获取 FormState 实例中 data[name] 值. name 为 FormChild 的 props.name 值
+### formChild.formValue
+实例属性，获取 FormState 实例中 data[name] 值. name 为 formChild 的 props.name 值
 
-### FormChild.formResult
-获取 FormState 实例中 results[name] 值. name 为 FormChild 的 props.name 值
+### formChild.formResult
+实例属性，获取 FormState 实例中 results[name] 值. name 为 formChild 的 props.name 值
 
-### FormChild.formNestResult
-获取 FormState 实例中 results[name].nest 值. name 为 FormChild 的 props.name 值。
+### formChild.formNestResult
+实例属性，获取 FormState 实例中 results[name].nest 值. name 为 formChild 的 props.name 值。
 当 Form 和 FormControl 同时存在校验时，Form 校验的 result 结果会带上 FormControl 的结果。
 
 ## FormControl

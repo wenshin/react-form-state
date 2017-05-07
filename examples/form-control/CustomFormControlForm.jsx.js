@@ -3,7 +3,7 @@ import Form, {FormState, FormField, FormControl} from 'react-form-state';
 import FormFooterField from '../FormFooterField.jsx';
 import Markdown from '../Markdown.jsx';
 
-const vajs = FormState.va;
+const vajs = FormState.vajs;
 
 function MyComponent(props) {
   return (

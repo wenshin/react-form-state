@@ -3,22 +3,16 @@ import Form, {FormState, FormField, FormControl, ExplainText} from 'react-form-s
 import FormFooterField from '../FormFooterField.jsx';
 import Markdown from '../Markdown.jsx';
 
-const vajs = FormState.vajs;
-
-const formCtrlValidator = vajs.map({
-  foo1: vajs.number({max: 10})
-});
-
-class CollectForm extends Component {
+class FormFieldDisabledForm extends Component {
   constructor(props) {
     super(props);
-    this.formState = createFormState(() => {
-      this.forceUpdate();
+    this.formState = new FormState({
+      data: {},
+      onStateChange: () => this.forceUpdate()
     });
   }
 
   render() {
-    const collectedResults = this.formState.getNestResult('collected');
     return (
       <section>
         <Markdown>{`
@@ -32,12 +26,11 @@ FormControl 直接使用，可以自动监听子元素的 onChange 事件冒泡�
         <Form
           state={this.formState}
         >
-          <FormField name='collected' label='收集数据' isExplainInline={false}>
-            <FormControl validator={formCtrlValidator}>
+          <FormField disabled name='collected' label='收集数据' isExplainInline={false}>
+            <FormControl>
               <div>
                 <label>foo1: <input name='foo1' /></label>
                 <ExplainText
-                  validResult={collectedResults.foo1}
                   defaultExplain='最大不超过10'
                   inline
                 />
@@ -45,7 +38,6 @@ FormControl 直接使用，可以自动监听子元素的 onChange 事件冒泡�
               <div>
                 <label>foo2: <input name='foo2' /></label>
                 <ExplainText
-                  validResult={collectedResults.foo2}
                   defaultExplain='可选'
                   inline
                 />
@@ -53,7 +45,6 @@ FormControl 直接使用，可以自动监听子元素的 onChange 事件冒泡�
               <div>
                 <label>foo3: <input name='foo3' /></label>
                 <ExplainText
-                  validResult={collectedResults.foo3}
                   defaultExplain='可选'
                   inline
                 />
@@ -67,7 +58,8 @@ FormControl 直接使用，可以自动监听子元素的 onChange 事件冒泡�
   }
 }
 
-export default CollectForm;
+
+export default FormFieldDisabledForm;
 
 function createFormState(onStateChange) {
   return new FormState({

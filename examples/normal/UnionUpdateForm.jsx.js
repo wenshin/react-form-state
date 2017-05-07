@@ -1,8 +1,9 @@
 import {Component} from 'react';
+// 目前只发包了 @myfe/react-form-state，实际使用时，请使用 @myfe/react-form-state
 import Form, {FormState, InputField} from 'react-form-state';
 import FormFooterField from '../FormFooterField.jsx';
 
-const vajs = FormState.va;
+const vajs = FormState.vajs;
 
 class UnionUpdateForm extends Component {
   constructor(props) {

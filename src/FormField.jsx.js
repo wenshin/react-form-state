@@ -3,7 +3,7 @@ import React, {PropTypes, Children, cloneElement} from 'react';
 import ExplainText from './ExplainText.jsx';
 import FormChild from './FormChild.jsx';
 
-const loop = () => {};
+const noop = () => {};
 
 export default class FormField extends FormChild {
   static propTypes = {
@@ -16,6 +16,10 @@ export default class FormField extends FormChild {
     isExplainShow: PropTypes.bool,
     // false，提示框非 inline 模式
     isExplainInline: PropTypes.bool,
+    validResult: PropTypes.shape({
+      isValid: PropTypes.bool,
+      message: PropTypes.oneOfType([PropTypes.string, PropTypes.object])
+    }),
     explain: PropTypes.shape({
       type: PropTypes.string,
       message: PropTypes.string
@@ -28,6 +32,7 @@ export default class FormField extends FormChild {
       })
     ]),
     required: PropTypes.bool,
+    disabled: PropTypes.bool,
     children: PropTypes.oneOfType([
       PropTypes.string,
       PropTypes.element,
@@ -45,6 +50,12 @@ export default class FormField extends FormChild {
     show: true
   };
 
+  static ExplainClass = ExplainText;
+
+  static setExplainClass(ExplainClass) {
+    FormField.ExplainClass = ExplainClass;
+  }
+
   static omitProps(props) {
     return _omit(props, [
       'className',
@@ -57,6 +68,10 @@ export default class FormField extends FormChild {
 
   renderLabel() {
     const {label, name, required} = this.props;
+    return this._renderLabel(label, name, required);
+  }
+
+  _renderLabel(label, name, required) {
     return label ? (
       <label htmlFor={name} className='form-label'>
         {required ? <span className='form-field__required'>*</span> : null}
@@ -69,15 +84,17 @@ export default class FormField extends FormChild {
     const {
       name,
       explain,
+      validResult,
       isExplainShow,
       isExplainInline,
       defaultExplain
     } = this.props;
 
     return isExplainShow ? (
-      <ExplainText
+      <FormField.ExplainClass
         name={name}
         inline={isExplainInline}
+        validResult={validResult || this.formResult}
         explain={explain}
         defaultExplain={defaultExplain}
       />
@@ -88,11 +105,11 @@ export default class FormField extends FormChild {
   renderField() {
     const {children, name} = this.props;
     let newChildren = children;
-    // 默认如果只有一个子元素，自动会给子元素新增 value
+    // 默认如果只有一个子元素，自动会给子元素新增 value 属性
     // 注意 input，textarea 等内置元素，动态添加 props，React 15 加了一些警告提示
     if (Children.count(children) === 1 && typeof children === 'object') {
       const props = this.formValue === undefined ? {} : {value: this.formValue};
-      props.onChange = children.props.onChange || loop;
+      props.onChange = children.props.onChange || noop;
 
       if (name) props.name = name;
       if (Object.keys(props).length) {
@@ -103,14 +120,17 @@ export default class FormField extends FormChild {
   }
 
   render() {
-    const {className, show} = this.props;
+    const {className, show, disabled} = this.props;
 
     return (
       <div className={'form-field ' + className} style={{display: show ? '' : 'none'}}>
         {this.renderLabel()}
-
-        {this.renderField()}
-
+        {disabled ? (
+          <div className='form-field-mask-container'>
+            {this.renderField()}
+            <div className='form-field-mask' />
+          </div>
+        ) : this.renderField()}
         {this.renderExplain()}
       </div>
     );

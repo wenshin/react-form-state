@@ -1,6 +1,6 @@
 import FormField from '../FormField.jsx';
 
-function loop() {}
+function noop() {}
 
 export default class InputField extends FormField {
   renderField() {
@@ -10,14 +10,14 @@ export default class InputField extends FormField {
     return props.type === 'textarea' ? (
       <textarea
         value={value}
-        onChange={loop}
+        onChange={noop}
         {...props}
       />
     ) : (
       <input
         type='text'
         value={value}
-        onChange={loop}
+        onChange={noop}
         {...props}
       />
     );

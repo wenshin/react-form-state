@@ -61,8 +61,6 @@
         }
 
         .explanation {
-            /* text-top 用在这里，可以使得文字已文字底部对齐，很奇怪的情况！！！*/
-            vertical-align: text-top;
             margin-left: @formFieldInlineGap;
         }
 
@@ -102,5 +100,22 @@
 
     .form__static-text {
         line-height: @formElementHeight;
+    }
+
+    .form-field-mask-container {
+        position: relative;
+        display: inline-block;
+        padding: 5px;
+        border-radius: 5px;
+    }
+
+    .form-field-mask {
+        position: absolute;
+        top: 0;
+        right: 0;
+        width: 100%;
+        height: 100%;
+        border-radius: 5px;
+        background-color: rgba(226, 226, 226, 0.4);
     }
 }

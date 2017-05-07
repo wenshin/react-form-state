@@ -3,11 +3,10 @@ import ExplainBase from './ExplainBase.jsx';
 export default class ExplainText extends ExplainBase {
   inline = false;
 
-  renderSub(explain) {
-    const {className = ''} = this.props;
+  renderExplain(explain) {
     return (
       <span
-        className={`form-explain__text ${className}`}
+        className='form-explain__text'
       >
         {explain.message || null}
       </span>

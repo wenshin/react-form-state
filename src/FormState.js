@@ -37,15 +37,16 @@ class FormState {
     const mapResult = this.validator.validate(this.data, this);
     for (const name of Object.keys(mapResult.results)) {
       const result = mapResult.results[name];
+      // 不记录校验成功的参数
       if (!result.isValid) {
+        // 编辑模式保存所有校验信息，
+        // 非编辑模式，不保存校验信息，只让 isValid 生效
         if (this.isEdit) {
-          // 不记录校验成功的参数
           this.results[name] = result;
         }
         if (result.promise) {
           this._dealInitResultPromise(name, result);
         }
-        // 不记录任何校验信息，只是的 isValid 生效
         this._invalidSet.add(name);
       }
     }
@@ -68,13 +69,16 @@ class FormState {
   }
 
   /**
-   * [update description]
+   * 校验数据并触发 state 更新事件
    * @param  {String}      name
    * @param  {any}         value
    * @param  {vajs.Result} validationResult 自带校验结果
    */
   updateState(name, value, validationResult) {
     const result = this.update(name, value, validationResult);
+    // 值没有变化不触发变更
+    if (!result) return;
+
     if (result.promise) {
       result
         .promise
@@ -95,7 +99,7 @@ class FormState {
     return this.validateOne(name, value, validationResult);
   }
 
-   // 可用于联合校验
+  // 可用于联合校验
   // this.validateOne(name) 可以根据现有数据进行校验
   validateOne(name, value, validationResult) {
     if (value === undefined) {
@@ -157,7 +161,7 @@ class FormState {
 }
 
 
-FormState.va = vajs;
+FormState.vajs = vajs;
 
 module.exports = FormState;
 

@@ -49,13 +49,13 @@ export default class ExplainBase extends FormChild {
    * @param  {Object} explain 经过默认值处理的 explain 对象
    * @return {ReactElement}   用于 react 渲染的元素
    */
-  renderSub() {
-    throw new Error('ExplainBase.renderSub should been implemented');
+  renderExplain() {
+    throw new Error('ExplainBase.renderExplain should been implemented');
   }
 
   render() {
     const {inline, name} = this.props;
-    let {validResult, explain, defaultExplain} = this.props;
+    let {className, validResult, explain, defaultExplain} = this.props;
 
     if (name) {
       validResult = validResult || this.formResult;
@@ -69,18 +69,18 @@ export default class ExplainBase extends FormChild {
 
     const {type} = explain;
 
-    let className = cx({
+    let newClass = cx({
       'form-explain': true,
       'form-explain--inline': inline || this.inline
     });
 
     if (type) {
-      className = `${className} form-explain--${type}`;
+      newClass = `${newClass} form-explain--${type} ${className}`;
     }
 
     return (
-      <div className={className}>
-        {this.renderSub(explain)}
+      <div className={newClass}>
+        {this.renderExplain(explain)}
       </div>
     );
   }

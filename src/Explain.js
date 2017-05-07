@@ -1,5 +1,11 @@
 export default class Explain {
-  static Types = {ERROR: 'error', WARN: 'warn', SUCC: 'success', INFO: 'info', PENDING: 'pending'};
+  static Types = {
+    ERROR: 'error',
+    WARN: 'warn',
+    SUCC: 'success',
+    INFO: 'info',
+    PENDING: 'pending'
+  };
 
   /**
    * Explain 对象工厂函数

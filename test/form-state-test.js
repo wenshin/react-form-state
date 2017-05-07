@@ -37,6 +37,21 @@ describe('FormState', () => {
     assert.ok(formState.results.bar instanceof vajs.Result);
   });
 
+  it('FormState.updateState update same value', () => {
+    const formState = new FormState({
+      data: {foo: 1, bar: 2},
+      validator: vajs.map({
+        foo: vajs.number({max: 5}),
+        bar: vajs.number({max: 12})
+      }),
+      onStateChange(state) {
+        throw new Error('except not to trigger state change event');
+      }
+    });
+
+    formState.updateState('foo', 1);
+  });
+
   it('joint no update validation', () => {
     const formState = new FormState({
       data: {foo: 1, bar: 2},

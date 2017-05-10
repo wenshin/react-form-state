@@ -19,13 +19,13 @@ class FormState {
     return !this._invalidSet.size;
   }
 
+  get isEmpty() {
+    return !Object.keys(this.data).length;
+  }
+
   getNestResult(name) {
     const result = this.results[name];
-    const nest = (result && result.nest) || {};
-    if (nest instanceof FormState) {
-      return (nest && nest.results) || {};
-    }
-    return nest;
+    return (result && result.nest) || {};
   }
 
   init() {
@@ -35,6 +35,11 @@ class FormState {
     if (!this.validator) return;
 
     const mapResult = this.validator.validate(this.data, this);
+
+    if (!mapResult.results) {
+      throw new Error('FormState.constructor(options) the result of options.validator.validate() must have results property');
+    }
+
     for (const name of Object.keys(mapResult.results)) {
       const result = mapResult.results[name];
       // 不记录校验成功的参数
@@ -69,13 +74,11 @@ class FormState {
   }
 
   /**
-   * 校验数据并触发 state 更新事件
-   * @param  {String}      name
-   * @param  {any}         value
-   * @param  {vajs.Result} validationResult 自带校验结果
+   * 更新、校验数据并触发 state 更新事件
+   * @param  {Object}  options   同 update 方法参数
    */
-  updateState(name, value, validationResult) {
-    const result = this.update(name, value, validationResult);
+  updateState(options) {
+    const result = this.update(options);
     // 值没有变化不触发变更
     if (!result) return;
 
@@ -91,38 +94,58 @@ class FormState {
     this.onStateChange && this.onStateChange(this);
   }
 
-  // 可用于进行关联数据更新
-  update(name, value, validationResult) {
+  /**
+   * 更新和校验数据
+   * @param  {Object}                                options
+   * 选项
+   * @param  {String}                                options.name
+   * 需要更新的字段名称
+   * @param  {any}                                   options.value
+   * 需要更新的字段值
+   * @param  {vajs.Result|vajs.MapReuslt|FormState}  options.validationResult
+   * 已经存在的校验结果，将作为嵌套结果保存在 FormState.results[name].nest 字段
+   * @param  {Boolean}                               options.ignoreNestValidation
+   * 如果为 true 则不会和嵌套的子校验结果联合校验，默认为 false
+   * @param  {vajs.Result|vajs.MapReuslt}
+   */
+  update({name, value, validationResult, ignoreNestValidation}) {
     if (!(value && typeof value === 'object') && value === this.data[name]) return null;
     this.data[name] = value;
     this.nameChanged = name;
-    return this.validateOne(name, value, validationResult);
+    return this.validateOne({name, value, validationResult, ignoreNestValidation});
   }
 
   // 可用于联合校验
   // this.validateOne(name) 可以根据现有数据进行校验
-  validateOne(name, value, validationResult) {
-    if (value === undefined) {
+  validateOne(options) {
+    const {name, validationResult, ignoreNestValidation} = options;
+
+    let {value} = options;
+    // 如果没有提供 value 属性，则认为校验当前保存的值
+    if (!('value' in options)) {
       value = this.data[name];
     }
 
-    // 联合校验时，需要和嵌套结果同时进行判断
-    if (validationResult === undefined && this.results[name]) {
-      validationResult = this.results[name].nest;
+    let nestResult;
+    if (!ignoreNestValidation) {
+      nestResult = validationResult;
+      // 联合校验时，需要和嵌套结果同时进行判断
+      if (!nestResult && this.results[name]) {
+        nestResult = this.results[name].nest;
+      }
     }
 
     let result = new vajs.Result({value});
-
     if (this.validator && this.validator.get(name)) {
       result = this.validator.validateOne(name, value, this);
       if (result.promise) {
         result.promise = result
           .promise
-          .then(res => this._mergeResult(name, res, validationResult))
+          .then(res => this._mergeResult(name, res, nestResult))
           .catch(err => this._onUnhandledRejection(err, name, result.value));
       }
     }
-    return this._mergeResult(name, result, validationResult);
+    return this._mergeResult(name, result, nestResult);
   }
 
   _mergeResult(name, result, validationResult) {

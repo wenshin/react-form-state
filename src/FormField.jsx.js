@@ -3,7 +3,6 @@ import React, {PropTypes, Children, cloneElement} from 'react';
 import ExplainText from './ExplainText.jsx';
 import FormChild from './FormChild.jsx';
 
-const noop = () => {};
 
 export default class FormField extends FormChild {
   static propTypes = {
@@ -56,8 +55,8 @@ export default class FormField extends FormChild {
     FormField.ExplainClass = ExplainClass;
   }
 
-  static omitProps(props) {
-    return _omit(props, [
+  pickProps(props) {
+    return _omit(this.props, [
       'className',
       'label', 'labelTip', 'labelTipPlace',
       'explain', 'defaultExplain',
@@ -103,15 +102,16 @@ export default class FormField extends FormChild {
 
   // 集成时可用于重写 获取 children 的方法
   renderField() {
-    const {children, name} = this.props;
+    const {children, name, required} = this.props;
     let newChildren = children;
     // 默认如果只有一个子元素，自动会给子元素新增 value 属性
     // 注意 input，textarea 等内置元素，动态添加 props，React 15 加了一些警告提示
     if (Children.count(children) === 1 && typeof children === 'object') {
       const props = this.formValue === undefined ? {} : {value: this.formValue};
-      props.onChange = children.props.onChange || noop;
-
+      props.onChange = children.props.onChange;
+      props.required = required;
       if (name) props.name = name;
+
       if (Object.keys(props).length) {
         newChildren = cloneElement(children, props);
       }

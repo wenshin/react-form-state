@@ -9,7 +9,8 @@ import FormField from './FormField.jsx';
 import FormControl from './FormControl.jsx';
 import FormChild from './FormChild.jsx';
 import FormGroup from './FormGroup.jsx';
-import InputField from './form-fields/InputField.jsx';
+import Input from './components/Input.jsx';
+import InputField from './components/InputField.jsx';
 
 export default Form;
 
@@ -20,8 +21,12 @@ export {
   ExplainText,
   FormField,
   FormState,
-  InputField,
   FormControl,
   FormChild,
-  FormGroup
+  FormGroup,
+  /**
+   * 自定义封装的常用组件
+   */
+  Input,
+  InputField,
 };

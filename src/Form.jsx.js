@@ -62,7 +62,7 @@ export default class Form extends DataSet {
   renderChildren() {
     const {className, children} = this.props;
     return (
-      <div className={`form ${className || ''}`}>
+      <div className={`form-state ${className || ''}`}>
         {children}
       </div>
     );

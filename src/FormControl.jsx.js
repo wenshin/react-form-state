@@ -1,9 +1,12 @@
+import _omit from 'lodash/omit';
 import {PropTypes} from 'react';
 import {fireEvent, isInputEventSupported} from './event';
 import FormState from './FormState';
 
 import DataSet from './DataSet.jsx';
 import FormChild from './FormChild.jsx';
+
+const {vajs} = FormState;
 
 /**
  * 用法：
@@ -46,10 +49,17 @@ export default class FormControl extends FormChild {
     defaultValue: PropTypes.any,
     // 设置 value 表示把组件声明成 controlled 组件
     value: PropTypes.any,
+    required: PropTypes.bool,
     validator: PropTypes.shape({
-      validate: PropTypes.func,
+      validate: PropTypes.func
     })
   };
+
+  static defaultProps = {
+    required: false,
+    validator: null,
+    defaultValue: null
+  }
 
   /**
    * 扩展 FormControl 的静态对象属性，比如 propTypes, defaultProps
@@ -81,17 +91,30 @@ export default class FormControl extends FormChild {
   }
 
   get validator() {
-    return this.props.validator
-      || (
-        this._validator instanceof Function
-          ? this._validator()
-          : this._validator
-      );
+    const {required, validator} = this.props;
+    let v =  validator || (
+      this._validator instanceof Function
+        ? this._validator()
+        : this._validator
+    );
+
+    if (v) {
+      if (!required && v.notRequire) {
+        v.notRequire();
+      } else if (required && v.require) {
+        v.require();
+      }
+      return v;
+    }
+
+    if (!this._isCollectData && required) {
+      v = vajs.require();
+    }
+    return v;
   }
 
   get dataSetState() {
-    if (!this._isCollectData) return null;
-    if (!this._dataSet) {
+    if (this._isCollectData && !this._dataSet) {
       this._dataSet = new FormState({
         data: this.value,
         validator: this.validator,
@@ -99,6 +122,48 @@ export default class FormControl extends FormChild {
       });
     }
     return this._dataSet;
+  }
+
+  /**
+   * 子类继承时，需要使用 super.componentWillMount() 执行一次
+   * 或者直接调用 this._
+   */
+  componentWillMount() {
+    this._superComponentWillMountCalled = true;
+
+    if (!this.validator) return;
+
+    // FormControl 自定义的 validator 在首次渲染时需要和父组件联合校验一次
+    if (!this._dataSet) {
+      const {name} = this.props;
+      const result = this.validator.validate(this.value);
+      this.form.update({name, value: this.value, validationResult: result});
+    } else {
+      const result = this.validateWithDataSet();
+      this.form.update({name, value: this.value, validationResult: result});
+    }
+  }
+
+  validateWithDataSet() {
+    let result;
+    const {required} = this.props;
+    if (this._dataSet.isEmpty && required) {
+      result = vajs.require().validate();
+    } else {
+      result = new vajs.MapResult();
+      result.results = this._dataSet.results;
+    }
+    return result;
+  }
+
+  pickProps() {
+    const {defaultValue} = this.props;
+    // React 要求 value 和 defaultValue 只能有一个。。。
+    if (defaultValue) {
+      return _omit(this.props, ['validator']);
+    } else {
+      return _omit(this.props, ['validator', 'defaultValue']);
+    }
   }
 
   // 继承时可覆盖，设置联合校验等逻辑
@@ -126,7 +191,7 @@ export default class FormControl extends FormChild {
       // 赋值后值会变成`value.toString()`。
       if (this._isCollectData) {
         _input.formControlValue = value.data;
-        _input.formControlResult = value;
+        _input.formControlResult = this.validateWithDataSet();
       } else {
         _input.formControlValue = value;
         if (this.validator) {
@@ -152,6 +217,10 @@ export default class FormControl extends FormChild {
   }
 
   render() {
+    if (!this._superComponentWillMountCalled) {
+      throw new Error('继承 FormControl 并重写 componentWillMount 需要调用 super.componentWillMount()');
+    }
+
     const {className, name, onChange, children} = this.props;
     let customChildren = this.renderFormControl();
 

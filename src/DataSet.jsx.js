@@ -16,7 +16,11 @@ export default class DataSet extends Component {
     if (data.name) {
       // 经过节流后，SyntheticEvent 对象会重置，不能执行 e.stopPropagation。
       e.stopPropagation();
-      this.props.state.updateState(data.name, data.value, data.formControlResult);
+      this.props.state.updateState({
+        name: data.name,
+        value: data.value,
+        validationResult: data.formControlResult
+      });
     }
   }
 

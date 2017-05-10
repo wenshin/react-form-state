@@ -103,7 +103,7 @@ function App() {
 
         <section>
           <h4>继承 FormField</h4>
-          <p>可以通过继承 FormField 并重写 renderLable, renderField, renderExplain 三个方法自定义 FormField</p>
+          <p>可以通过继承 FormField 并重写 renderLabel, renderField, renderExplain 三个方法自定义 FormField</p>
           <section>
             <Code lang='jsx' code={InputField.srcContent} />
           </section>
@@ -123,7 +123,8 @@ function App() {
       <section>
         <Markdown>{`
 # API
-reat-form-state 依赖 [vajs](https://github.com/wenshin/vajs)，
+reat-form-state 依赖 [vajs@^1.0.2](https://github.com/wenshin/vajs)，
+推荐通过 FormState.vajs 获取而不是直接依赖。
 
 ## FormState
 FormState 是一个纯 JS 类，负责处理表单状态变化。

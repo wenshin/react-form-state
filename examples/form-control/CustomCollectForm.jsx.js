@@ -74,6 +74,7 @@ function createFormState(onStateChange) {
         return isValid;
       })
     }),
+    nestFailMessage: '校验失败！',
     onStateChange
   });
 }

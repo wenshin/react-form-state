@@ -5,9 +5,10 @@
         "browsers": ["last 2 versions", "safari >= 7"]
       }
     }],
-    "latest",
-    "stage-0",
     "react"
   ],
-  "plugins": ["syntax-async-functions", "transform-regenerator"]
+  "plugins": [
+    "transform-class-properties",
+    "transform-object-rest-spread"
+  ]
 }

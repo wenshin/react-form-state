@@ -54,7 +54,7 @@ const webpackConfig = {
   devServer: {
     contentBase: BUILD_EXAMPLES_PATH,
     compress: true,
-    port: 8080,
+    port: 8181,
     // NOTE devServer.publicPath 必须和 output.publicPath 一致
     // publicPath: STATIC_URL,
     hot: true,

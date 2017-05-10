@@ -5,7 +5,7 @@ const FormState = require(`../${process.env.NODE_LIB || 'src'}/FormState`);
 
 describe('FormState', () => {
   it('constructor', () => {
-    const formState = new FormState({
+    let formState = new FormState({
       data: {foo: 1},
       validator: vajs.map({
         foo: vajs.number({max: 0})
@@ -13,6 +13,16 @@ describe('FormState', () => {
     });
     assert.ok(!formState.isValid);
     assert.ok(!formState.results.foo);
+
+    formState = new FormState();
+    assert.ok(formState.isValid);
+    assert.ok(formState.isEmpty);
+
+    assert.throws(() => {
+      new FormState({
+        validator: vajs.require()
+      });
+    }, Error);
   });
 
   it('options.onStateChange and joint update validation', () => {
@@ -24,13 +34,13 @@ describe('FormState', () => {
       }),
       onStateChange(state) {
         if (state.nameChanged === 'foo') {
-          state.update('bar', state.data.foo + 10);
+          state.update({name: 'bar', value: state.data.foo + 10});
         }
       }
     });
 
     assert.ok(!formState.results.bar, 'bar');
-    formState.updateState('foo', 4);
+    formState.updateState({name: 'foo', value: 4});
     assert.ok(!formState.isValid, 'isValid');
     assert.ok(formState.results.foo.isValid, 'foo');
     assert.ok(!formState.results.bar.isValid, 'bar');
@@ -49,7 +59,7 @@ describe('FormState', () => {
       }
     });
 
-    formState.updateState('foo', 1);
+    formState.updateState({name: 'foo', value: 1});
   });
 
   it('joint no update validation', () => {
@@ -61,20 +71,21 @@ describe('FormState', () => {
       }),
       onStateChange(state) {
         if (state.nameChanged === 'foo') {
-          state.validateOne('bar');
+          // only validate
+          state.validateOne({name: 'bar'});
         }
       }
     });
 
     assert.ok(!formState.isValid, 'init isValid');
-    formState.updateState('foo', 4);
+    formState.updateState({name: 'foo', value: 4});
     assert.ok(!formState.isValid, 'isValid');
     assert.ok(formState.results.foo.isValid, 'foo');
     assert.ok(!formState.results.bar.isValid, 'bar');
     assert.ok(formState.results.bar instanceof vajs.Result);
   });
 
-  it('nest state validation', () => {
+  it('nest validation with FormState', () => {
     const formState = new FormState({
       data: {},
       validator: vajs.map({
@@ -91,15 +102,20 @@ describe('FormState', () => {
       })
     });
 
-    fooState.updateState('a', 7);
-    formState.updateState('foo', fooState.data, fooState);
+    fooState.updateState({name: 'a', value: 7});
+    formState.updateState({
+      name: 'foo',
+      value: fooState.data,
+      validationResult: fooState
+    });
     assert.ok(!formState.isValid, 'isValid');
     assert.ok(!formState.results.foo.isValid, 'foo');
     assert.ok(formState.results.foo.message, formState.nestFailMessage);
     assert.ok(formState.results.foo.nest === fooState, 'foo');
+    assert.equal(formState.getNestResult('foo'), fooState);
   });
 
-  it('nest vajs.map result validation', () => {
+  it('nest validation with vajs.MapResult', () => {
     const formState = new FormState({
       data: {},
       validator: vajs.map({
@@ -112,14 +128,19 @@ describe('FormState', () => {
     const result = vajs.map({
       a: vajs.number({max: 1})
     }).validate({a: 2});
-    formState.updateState('foo', {a: 2}, result);
+    formState.updateState({
+      name: 'foo',
+      value: {a: 2},
+      validationResult: result
+    });
     assert.ok(!formState.isValid, 'isValid');
     assert.ok(!formState.results.foo.isValid, 'foo');
     assert.ok(formState.results.foo.message, formState.nestFailMessage);
     assert.ok(formState.results.foo.nest === result, 'foo nest');
+    assert.equal(formState.getNestResult('foo'), result);
   });
 
-  it('nest vajs normal result validation', () => {
+  it('nest validation with vajs.Result ', () => {
     const formState = new FormState({
       data: {},
       validator: vajs.map({
@@ -128,18 +149,30 @@ describe('FormState', () => {
     });
 
     let result = vajs.number({max: 1}).validate(2);
-    formState.updateState('foo', 2, result);
+    formState.updateState({
+      name: 'foo',
+      value: 2,
+      validationResult: result
+    });
     assert.ok(!formState.isValid, 'isValid');
     assert.ok(!formState.results.foo.isValid, 'foo');
     assert.ok(formState.results.foo.message, result.message);
     assert.ok(formState.results.foo.nest, 'have foo nest');
 
     result = vajs.number({max: 10}).validate(9);
-    formState.updateState('foo', 9, result);
+    formState.updateState({
+      name: 'foo',
+      value: 9,
+      validationResult: result
+    });
     assert.ok(!formState.isValid, 'isValid');
     assert.ok(!formState.results.foo.isValid, 'foo');
-    assert.ok(formState.results.foo.message, formState.validator.validateOne('foo', 9));
+    assert.ok(
+      formState.results.foo.message,
+      formState.validator.validateOne({name: 'foo', value: 9})
+    );
     assert.ok(formState.results.foo.nest, 'have foo nest');
+    assert.equal(formState.getNestResult('foo'), result);
   });
 
   it('async validation', () => {
@@ -151,17 +184,28 @@ describe('FormState', () => {
     });
 
     let result = vajs.number({max: 1}).validate(2);
-    formState.updateState('foo', 2, result);
+    formState.updateState({
+      name: 'foo',
+      value: 2,
+      validationResult: result
+    });
     assert.ok(!formState.isValid, 'isValid');
     assert.ok(!formState.results.foo.isValid, 'foo');
     assert.ok(formState.results.foo.message, result.message);
     assert.ok(formState.results.foo.nest, 'have foo nest');
 
     result = vajs.number({max: 10}).validate(9);
-    formState.updateState('foo', 9, result);
+    formState.updateState({
+      name: 'foo',
+      value: 9,
+      validationResult: result
+    });
     assert.ok(!formState.isValid, 'isValid');
     assert.ok(!formState.results.foo.isValid, 'foo');
-    assert.ok(formState.results.foo.message, formState.validator.validateOne('foo', 9));
+    assert.ok(
+      formState.results.foo.message,
+      formState.validator.validateOne({name: 'foo', value: 9})
+    );
     assert.ok(formState.results.foo.nest, 'have foo nest');
   });
 
@@ -174,7 +218,7 @@ describe('FormState', () => {
         if (count === 1) {
           assert.equal(state.data.foo, 6);
           assert.ok(!state.isValid);
-          formState.updateState('foo', 2);
+          formState.updateState({name: 'foo', value: 2});
         } else if (count === 2) {
           assert.equal(state.data.foo, 2);
           assert.ok(!state.isValid);
@@ -202,8 +246,11 @@ describe('FormState', () => {
       onUnhandledRejection(err) {
         try {
           assert.equal(err.name, 'foo');
-          assert.equal(err.value, 2);
-          done();
+          // updateState 校验
+          if (err.value) {
+            assert.equal(err.value, 2);
+            done();
+          }
         } catch (error) {
           done(error);
         }
@@ -219,6 +266,6 @@ describe('FormState', () => {
       })
     });
 
-    formState.updateState('foo', 2);
+    formState.updateState({name: 'foo', value: 2});
   });
 });

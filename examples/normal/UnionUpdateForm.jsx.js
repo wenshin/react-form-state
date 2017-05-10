@@ -76,13 +76,16 @@ function createFormState(onStateChange) {
     onStateChange(state) {
       if (state.nameChanged === 'name') {
         // 联合更新
-        state.update('nickname', state.data.name.slice(0, 4));
+        state.update({
+          name: 'nickname',
+          value: state.data.name.slice(0, 4)
+        });
         // 联合校验
-        state.validateOne('fathername');
+        state.validateOne({name: 'fathername'});
       }
       if (state.nameChanged === 'fathername') {
         // 联合校验
-        state.validateOne('name');
+        state.validateOne({name: 'name'});
       }
       onStateChange(state);
     }

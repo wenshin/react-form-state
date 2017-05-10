@@ -35,12 +35,8 @@ export default AsyncValidationForm;
 
 function createFormState(onStateChange) {
   return new FormState({
-    data: {
-      name: 'test',
-      nickname: '',
-    },
     validator: vajs.map({
-      async: vajs.v(remoteValidate)
+      async: vajs.async(remoteValidate)
     }),
     onStateChange
   });
@@ -49,6 +45,9 @@ function createFormState(onStateChange) {
 function remoteValidate(val) {
   return new Promise((resolve, reject) => {
     clearTimeout(remoteValidate.timer);
+    if (!val) {
+      return resolve(vajs.require().validate());
+    }
     remoteValidate.timer = setTimeout(() => {
       setTimeout(() => {
         try {

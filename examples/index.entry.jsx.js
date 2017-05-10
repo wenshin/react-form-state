@@ -63,10 +63,6 @@ function App() {
           <section>
             <Code lang='jsx' code={UnionUpdateForm.srcContent} />
           </section>
-          <section>
-            <h4>FormFooterField</h4>
-            <Code lang='jsx' code={FormFooterField.srcContent} />
-          </section>
         </section>
 
         <section>
@@ -113,6 +109,10 @@ function App() {
           </section>
         </section>
         <section>
+          <h4>FormFooterField</h4>
+          <Code lang='jsx' code={FormFooterField.srcContent} />
+        </section>
+        <section>
           <h4>禁用 FormField</h4>
           <FormFieldDisabledForm />
           <section>
@@ -133,38 +133,35 @@ FormState 实例化时会执行一次全量的校验，但是并不会把结果�
 ### FormState.vajs
 类属性
 
-### formState.isValid
+### FormState.isValid
 实例属性，Boolean 类型，true 表示表单当前校验通过
 
-### formState.results
+### FormState.results
 实例属性，Object，与 data 结构一致的校验结果集合
 
-### formState.constructor({isEdit, data, validator, nestFailMessage, onStateChange})
+### FormState.constructor({isEdit, data, validator, nestFailMessage, onStateChange})
+类构造函数
 
+- **isEdit**，是否是编辑模式，如果是编辑模式，则第一次校验时会保留校验结果
 - **data**，表单初始化数据
 - **validator**，vajs.ValidatorMap 实例
-- **nestFailMessage** 当执行嵌套校验时的
+- **nestFailMessage** 当执行嵌套校验时，用作嵌套校验结果的错误提示
+- **onStateChange** 当执行 updateState 方法后触发该方法执行，参数为 FormState 实例
 
-### formState.updateState(name, value, validationResult)
+### FormState.prototype.updateState({name, value, validationResult, ignoreNestValidation})
 更新数据和校验，并触发 onStateChange 方法
 
 - **name**，表单初始化数据
 - **value**，vajs.ValidatorMap 实例
 - **validationResult**，存在嵌套校验结果需要同时判断
+- **ignoreNestValidation**，如果为 true 则不会和嵌套的子校验结果联合校验，默认为 false
 
-### formState.update(name, value, validationResult)
-只是更新数据和校验，适合用于联合更新数据
+### FormState.prototype.update({name, value, validationResult, ignoreNestValidation})
+只是更新数据和校验，适合用于联合更新数据，参数和 \`updateState\` 方法相同
 
-- **name**，表单初始化数据
-- **value**，vajs.ValidatorMap 实例
-- **validationResult**，存在嵌套校验结果需要同时判断
-
-### formState.validateOne(name, value, validationResult)
-校验指定数据，适合用于数据不更新只是校验
-
-- **name**，表单初始化数据
-- **value**，vajs.ValidatorMap 实例
-- **validationResult**，存在嵌套校验结果需要同时判断
+### FormState.prototype.validateOne({name, value, validationResult, ignoreNestValidation})
+校验指定数据，适合用于数据不更新只是校验，参数同 \`updateState\`。
+如果 value 属性不存在于参数对象时，认为使用当前保存的值进行校验。
 
 ## DataSet
 DataSet 实现了监听 onChange 事件冒泡的逻辑，调用 props.state.updateState 进行数据更新。
@@ -178,22 +175,22 @@ FormChild 初始化了 Form 组件的 context 属性，
 如果继承 FormChild 即可得到获取 Form 数据的方法。
 FormControl，FormField，ExplainBase 等组件均是 FormChild 的子类。
 
-### formChild.form
+### FormChild.form
 实例属性，获取 Form 组件的 FormState 实例
 
-### formChild.formData
+### FormChild.formData
 实例属性，获取 FormState 实例的 data 属性
 
-### formChild.formResults
+### FormChild.formResults
 实例属性，获取 FormState 实例的 results 属性
 
-### formChild.formValue
+### FormChild.formValue
 实例属性，获取 FormState 实例中 data[name] 值. name 为 formChild 的 props.name 值
 
-### formChild.formResult
+### FormChild.formResult
 实例属性，获取 FormState 实例中 results[name] 值. name 为 formChild 的 props.name 值
 
-### formChild.formNestResult
+### FormChild.formNestResult
 实例属性，获取 FormState 实例中 results[name].nest 值. name 为 formChild 的 props.name 值。
 当 Form 和 FormControl 同时存在校验时，Form 校验的 result 结果会带上 FormControl 的结果。
 

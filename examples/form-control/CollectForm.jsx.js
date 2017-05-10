@@ -18,7 +18,8 @@ class CollectForm extends Component {
   }
 
   render() {
-    const collectedResults = this.formState.getNestResult('collected');
+    const collectedResult = this.formState.getNestResult('collected');
+    const results = collectedResult && collectedResult.results || {};
     return (
       <section>
         <Markdown>{`
@@ -37,7 +38,7 @@ FormControl 直接使用，可以自动监听子元素的 onChange 事件冒泡�
               <div>
                 <label>foo1: <input name='foo1' /></label>
                 <ExplainText
-                  validResult={collectedResults.foo1}
+                  validResult={results.foo1}
                   defaultExplain='最大不超过10'
                   inline
                 />
@@ -45,7 +46,7 @@ FormControl 直接使用，可以自动监听子元素的 onChange 事件冒泡�
               <div>
                 <label>foo2: <input name='foo2' /></label>
                 <ExplainText
-                  validResult={collectedResults.foo2}
+                  validResult={results.foo2}
                   defaultExplain='可选'
                   inline
                 />
@@ -53,7 +54,7 @@ FormControl 直接使用，可以自动监听子元素的 onChange 事件冒泡�
               <div>
                 <label>foo3: <input name='foo3' /></label>
                 <ExplainText
-                  validResult={collectedResults.foo3}
+                  validResult={results.foo3}
                   defaultExplain='可选'
                   inline
                 />

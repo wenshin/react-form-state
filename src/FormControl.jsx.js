@@ -49,6 +49,7 @@ export default class FormControl extends FormChild {
     defaultValue: PropTypes.any,
     // 设置 value 表示把组件声明成 controlled 组件
     value: PropTypes.any,
+    onChange: PropTypes.func,
     required: PropTypes.bool,
     validator: PropTypes.shape({
       validate: PropTypes.func
@@ -58,6 +59,7 @@ export default class FormControl extends FormChild {
   static defaultProps = {
     required: false,
     validator: null,
+    onChange: null,
     defaultValue: null
   }
 

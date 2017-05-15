@@ -18,6 +18,9 @@ A powerful react form support union validation and nest validation.
 
 ## Releases
 
+**0.1.1**
+- fix FormField bug
+
 **0.1.0**
 > this version is not a backward compatible upgrade.
 

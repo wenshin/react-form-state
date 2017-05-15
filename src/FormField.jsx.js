@@ -109,7 +109,7 @@ export default class FormField extends FormChild {
     if (Children.count(children) === 1 && typeof children === 'object') {
       const props = this.formValue === undefined ? {} : {value: this.formValue};
       props.onChange = children.props.onChange;
-      props.required = required;
+      props.required = children.props.required || required;
       if (name) props.name = name;
 
       if (Object.keys(props).length) {

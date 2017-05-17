@@ -18,6 +18,10 @@ A powerful react form support union validation and nest validation.
 
 ## Releases
 
+**0.2.1**
+
+- fix merge nested result bug
+
 **0.2.0**
 version 0.2.0 remove the nesting validation of FormControl and FormState. you need do nesting validation by your self with Util.mergeNestedResult()
 > this version is not a backward compatible upgrade.

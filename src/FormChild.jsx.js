@@ -1,4 +1,5 @@
 import {Component, PropTypes} from 'react';
+import Util from './util';
 
 /**
  * FormChild 表单元素组件的基类
@@ -19,7 +20,7 @@ export default class FormChild extends Component {
   }
 
   get formResults() {
-    return this.form.results;
+    return this.form.results || {};
   }
 
   get formValue() {
@@ -29,12 +30,11 @@ export default class FormChild extends Component {
 
   get formResult() {
     const {name} = this.props; // eslint-disable-line react/prop-types
-    return this.form.results[name];
+    return this.formResults[name];
   }
 
-  get formNestResult() {
-    const {name} = this.props; // eslint-disable-line react/prop-types
-    return this.form.getNestResult(name);
+  get formNestedResult() {
+    return Util.getNestedResult(this.formResult);
   }
 
   get formValidator() {

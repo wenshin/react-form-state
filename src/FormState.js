@@ -9,7 +9,6 @@ class FormState {
     // 如果不是 edit 模式，那么首次数据校验错误信息不会存到 this.results 中
     // 这样新建默认不会显示很多必填的错误显示
     this.isEdit = options.isEdit;
-    this.nestFailMessage = options.nestFailMessage || 'validation fail';
     this.nameChanged = '';
 
     this.init();
@@ -21,11 +20,6 @@ class FormState {
 
   get isEmpty() {
     return !Object.keys(this.data).length;
-  }
-
-  getNestResult(name) {
-    const result = this.results[name];
-    return (result && result.nest) || {};
   }
 
   init() {
@@ -102,37 +96,23 @@ class FormState {
    * 需要更新的字段名称
    * @param  {any}                                   options.value
    * 需要更新的字段值
-   * @param  {vajs.Result|vajs.MapReuslt|FormState}  options.validationResult
-   * 已经存在的校验结果，将作为嵌套结果保存在 FormState.results[name].nest 字段
-   * @param  {Boolean}                               options.ignoreNestValidation
-   * 如果为 true 则不会和嵌套的子校验结果联合校验，默认为 false
    * @param  {vajs.Result|vajs.MapReuslt}
    */
-  update({name, value, validationResult, ignoreNestValidation}) {
+  update({name, value}) {
     if (!(value && typeof value === 'object') && value === this.data[name]) return null;
     this.data[name] = value;
     this.nameChanged = name;
-    return this.validateOne({name, value, validationResult, ignoreNestValidation});
+    return this.validateOne({name, value});
   }
 
   // 可用于联合校验
   // this.validateOne(name) 可以根据现有数据进行校验
   validateOne(options) {
-    const {name, validationResult, ignoreNestValidation} = options;
-
+    const {name} = options;
     let {value} = options;
     // 如果没有提供 value 属性，则认为校验当前保存的值
     if (!('value' in options)) {
       value = this.data[name];
-    }
-
-    let nestResult;
-    if (!ignoreNestValidation) {
-      nestResult = validationResult;
-      // 联合校验时，需要和嵌套结果同时进行判断
-      if (!nestResult && this.results[name]) {
-        nestResult = this.results[name].nest;
-      }
     }
 
     let result = new vajs.Result({value});
@@ -141,31 +121,14 @@ class FormState {
       if (result.promise) {
         result.promise = result
           .promise
-          .then(res => this._mergeResult(name, res, nestResult))
+          .then(res => this._updateResult(name, res))
           .catch(err => this._onUnhandledRejection(err, name, result.value));
       }
     }
-    return this._mergeResult(name, result, nestResult);
+    return this._updateResult(name, result);
   }
 
-  _mergeResult(name, result, validationResult) {
-    if (validationResult) {
-      result.nest = validationResult;
-      if (!validationResult.isValid) {
-        const isValid = result.isValid && validationResult.isValid;
-        if (isSingleResult(validationResult)) {
-          // 如果当前校验为成功，子校验为失败，使用子校验的错误信息
-          if (result.isValid && !validationResult.isValid) {
-            result.message = validationResult.message;
-          }
-        } else if (result.isValid) {
-          // 如果当前校验失败，则使用当前校验的 message，如果当前校验成功则使用默认的嵌套失败信息
-          result.message = isValid ? '' : this.nestFailMessage;
-        }
-        result.isValid = isValid;
-      }
-    }
-
+  _updateResult(name, result) {
     result.isValid
       ? this._invalidSet.delete(name)
       : this._invalidSet.add(name);

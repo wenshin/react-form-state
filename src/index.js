@@ -1,5 +1,6 @@
 import Explain from './Explain';
 import FormState from './FormState';
+import Util from './util';
 
 import DataSet from './DataSet.jsx';
 import Form from './Form.jsx';
@@ -15,12 +16,14 @@ import InputField from './components/InputField.jsx';
 export default Form;
 
 export {
+  Util,
+  FormState,
+
   DataSet,
   Explain,
   ExplainBase,
   ExplainText,
   FormField,
-  FormState,
   FormControl,
   FormChild,
   FormGroup,

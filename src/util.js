@@ -8,14 +8,14 @@ const Util = {
 export default Util;
 
 
-function mergeNestedResult(result, nestedResult) {
+function mergeNestedResult(parentResult, nestedResult) {
   let merged = new vajs.Result();
-  merged.isValid = result.isValid && nestedResult.isValid;
-  merged.initial = result;
+  merged.isValid = parentResult.isValid && nestedResult.isValid;
+  merged.initial = parentResult;
   merged.nested = nestedResult;
 
-  if (!result.isValid) {
-    merged.message = result.message;
+  if (!parentResult.isValid) {
+    merged.message = parentResult.message;
     if (!merged.message && !nestedResult.isValid) {
       merged.message = nestedResult.message;
     }

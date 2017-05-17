@@ -15,7 +15,7 @@ const {vajs} = FormState;
  * // 使用1：继承自定义 FormControl。便于封装 validators，达到非常好的可重用效果
  *
  * class CustomFormControl extends FormControl {
- *   _validator = vajs.map({key: vajs.require()});
+ *   static validator = vajs.map({key: vajs.require()});
  *   // 自动搜集数据
  *   _isCollectData = true;
  *
@@ -31,7 +31,7 @@ const {vajs} = FormState;
  * }
  *
  * // 通过继承，封装 validator，并且可以重新定义 validator
- * <CustomFormControl name value validator />
+ * <CustomFormControl name value />
  *
  * // 使用2：封装多个数据为对象格式。以下例子会获得 {test: {a1, a2}} 的数据结构
  * <FormControl name='test'>

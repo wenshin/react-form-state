@@ -1,31 +1,32 @@
 import {Component} from 'react';
-import Form, {FormState, FormField, FormControl, ExplainText} from 'react-form-state';
+import Form, {Util, FormState, FormField, FormControl, ExplainText} from 'react-form-state';
 import FormFooterField from '../FormFooterField.jsx';
 import Markdown from '../Markdown.jsx';
 
 const vajs = FormState.vajs;
 
 class MyFormControl extends FormControl {
-  _validator = vajs.map({
+  static validator = vajs.map({
     foo1: vajs.number({max: 10})
   });
 
   _isCollectData = true;
 
   renderFormControl() {
+    const results = this.formNestedResult.results || {};
     return (
       <div>
         <div>
           <label>foo1: <input name='foo1' /></label>
-          <ExplainText validResult={this.result.foo1} defaultExplain='最大不超过10' inline />
+          <ExplainText validResult={results.foo1} defaultExplain='最大不超过10' inline />
         </div>
         <div>
           <label>foo2: <input name='foo2' /></label>
-          <ExplainText validResult={this.result.foo2} defaultExplain='可选' inline />
+          <ExplainText validResult={results.foo2} defaultExplain='可选' inline />
         </div>
         <div>
           <label>foo3: <input name='foo3' /></label>
-          <ExplainText validResult={this.result.foo3} defaultExplain='可选' inline />
+          <ExplainText validResult={results.foo3} defaultExplain='可选' inline />
         </div>
       </div>
     );
@@ -67,14 +68,16 @@ function createFormState(onStateChange) {
     data: {},
     validator: vajs.map({
       collected: vajs.v((val) => {
+        let result;
         const isValid = val.foo1 && val.foo2 && val.foo3;
         if (!isValid) {
-          return new vajs.Result({value: val, isValid: false, message: '所有字段不能为空'});
+          result = new vajs.Result({value: val, isValid: false, message: '所有字段不能为空'});
+        } else {
+          result = new vajs.Result({value: val, isValid: true});
         }
-        return isValid;
+        return Util.mergeNestedResult(result, MyFormControl.validator.validate(val));
       })
     }),
-    nestFailMessage: '校验失败！',
     onStateChange
   });
 }

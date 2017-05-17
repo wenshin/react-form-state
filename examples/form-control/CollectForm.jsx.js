@@ -1,5 +1,5 @@
 import {Component} from 'react';
-import Form, {FormState, FormField, FormControl, ExplainText} from 'react-form-state';
+import Form, {Util, FormState, FormField, FormControl, ExplainText} from 'react-form-state';
 import FormFooterField from '../FormFooterField.jsx';
 import Markdown from '../Markdown.jsx';
 
@@ -18,8 +18,8 @@ class CollectForm extends Component {
   }
 
   render() {
-    const collectedResult = this.formState.getNestResult('collected');
-    const results = collectedResult && collectedResult.results || {};
+    const nestedResult = Util.getNestedResult(this.formState.results.collected);
+    const results = nestedResult.results || {};
     return (
       <section>
         <Markdown>{`
@@ -34,7 +34,7 @@ FormControl 直接使用，可以自动监听子元素的 onChange 事件冒泡�
           state={this.formState}
         >
           <FormField name='collected' label='收集数据' isExplainInline={false}>
-            <FormControl validator={formCtrlValidator}>
+            <FormControl>
               <div>
                 <label>foo1: <input name='foo1' /></label>
                 <ExplainText
@@ -75,11 +75,14 @@ function createFormState(onStateChange) {
     data: {},
     validator: vajs.map({
       collected: vajs.v((val) => {
+        let result;
         const isValid = val.foo1 && val.foo2 && val.foo3;
         if (!isValid) {
-          return new vajs.Result({value: val, isValid: false, message: '所有字段不能为空'});
+          result = new vajs.Result({value: val, isValid: false, message: '所有字段不能为空'});
+        } else {
+          result = new vajs.Result({value: val, isValid: true});
         }
-        return isValid;
+        return Util.mergeNestedResult(result, formCtrlValidator.validate(val));
       })
     }),
     // 如果 FormControl 自带校验失败，Form 校验成功，那么得到默认的错误信息 'validation fail'。

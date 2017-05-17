@@ -1,5 +1,5 @@
 import {Component} from 'react';
-import Form, {FormState, FormField, FormControl} from 'react-form-state';
+import Form, {Util, FormState, FormField, FormControl} from 'react-form-state';
 import FormFooterField from '../FormFooterField.jsx';
 import Markdown from '../Markdown.jsx';
 
@@ -18,7 +18,7 @@ function MyComponent(props) {
 }
 
 class MyFormControl extends FormControl {
-  _validator = vajs.number({max: 0.3});
+  static validator = vajs.number({min: 0.3});
 
   renderFormControl() {
     return <MyComponent onChange={this.triggerChange} />;
@@ -60,7 +60,11 @@ function createFormState(onStateChange) {
   return new FormState({
     data: {},
     validator: vajs.map({
-      foo: vajs.number({max: 0.5})
+      foo: vajs.v((val) => {
+        const result = vajs.number({max: 0.5}).validate(val);
+        const nestedResult = MyFormControl.validator.validate(val);
+        return Util.mergeNestedResult(result, nestedResult);
+      })
     }),
     onStateChange
   });

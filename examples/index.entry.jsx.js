@@ -36,6 +36,13 @@ function App() {
 这往往发生在内网和外网同时提供服务，PC 端和移动端同时提供服务，
 我们期望表单的数据处理逻辑可以直接被复用。
 
+### 核心逻辑简单化
+从 0.2.0 开始，FormState 和 FromControl 不会自动进行嵌套校验。因为在实际应用中，很难优雅的兼顾所有场景。
+如果你想要实现嵌套校验，你需要使用 \`import {Util} from 'react-from-state'\` 中的
+Util.mergeNestedResult 方法去实现。具体用法见 API 说明和 FormControl 的相关示例。
+当然如果 FormControl 自带一些通用的校验，你仍然可以在 FromControl 文件中维护，
+一般可以是 FormControl 类的静态方法。
+
 ### 样式最简
 现实中，很多业务没有办法直接使用固定的样式，如果组件提供复杂的样式实现，将很大概率导致样式冲突。
 
@@ -126,6 +133,15 @@ function App() {
 reat-form-state 依赖 [vajs@^1.0.2](https://github.com/wenshin/vajs)，
 推荐通过 FormState.vajs 获取而不是直接依赖。
 
+## Util
+从 0.2.0 开始引入
+
+### Util.mergeNestedResult(parentResult, nestedResult)
+
+- **parentResult**，一般是父级校验结果
+- **nestedResult**，需要嵌套到新的结果中的校验结果
+
+
 ## FormState
 FormState 是一个纯 JS 类，负责处理表单状态变化。
 FormState 实例化时会执行一次全量的校验，但是并不会把结果存储到 result 中。
@@ -140,27 +156,24 @@ FormState 实例化时会执行一次全量的校验，但是并不会把结果�
 ### FormState.results
 实例属性，Object，与 data 结构一致的校验结果集合
 
-### FormState.constructor({isEdit, data, validator, nestFailMessage, onStateChange})
+### FormState.constructor({isEdit, data, validator, onStateChange})
 类构造函数
 
 - **isEdit**，是否是编辑模式，如果是编辑模式，则第一次校验时会保留校验结果
 - **data**，表单初始化数据
 - **validator**，vajs.ValidatorMap 实例
-- **nestFailMessage** 当执行嵌套校验时，用作嵌套校验结果的错误提示
 - **onStateChange** 当执行 updateState 方法后触发该方法执行，参数为 FormState 实例
 
-### FormState.prototype.updateState({name, value, validationResult, ignoreNestValidation})
+### FormState.prototype.updateState({name, value})
 更新数据和校验，并触发 onStateChange 方法
 
 - **name**，表单初始化数据
 - **value**，vajs.ValidatorMap 实例
-- **validationResult**，存在嵌套校验结果需要同时判断
-- **ignoreNestValidation**，如果为 true 则不会和嵌套的子校验结果联合校验，默认为 false
 
-### FormState.prototype.update({name, value, validationResult, ignoreNestValidation})
+### FormState.prototype.update({name, value})
 只是更新数据和校验，适合用于联合更新数据，参数和 \`updateState\` 方法相同
 
-### FormState.prototype.validateOne({name, value, validationResult, ignoreNestValidation})
+### FormState.prototype.validateOne({name, value})
 校验指定数据，适合用于数据不更新只是校验，参数同 \`updateState\`。
 如果 value 属性不存在于参数对象时，认为使用当前保存的值进行校验。
 
@@ -168,8 +181,10 @@ FormState 实例化时会执行一次全量的校验，但是并不会把结果�
 DataSet 实现了监听 onChange 事件冒泡的逻辑，调用 props.state.updateState 进行数据更新。
 是用于实现 Form 和 FormControl 搜集数据功能的核心功能。
 
+
 ## Form
 Form 组件是搜集整个表单的数据的根节点。props.state 必须是 FormState 实例。继承自 DataSet 类
+
 
 ## FormChild
 FormChild 初始化了 Form 组件的 context 属性，
@@ -191,15 +206,19 @@ FormControl，FormField，ExplainBase 等组件均是 FormChild 的子类。
 ### FormChild.formResult
 实例属性，获取 FormState 实例中 results[name] 值. name 为 formChild 的 props.name 值
 
-### FormChild.formNestResult
+### FormChild.formNestedResult
 实例属性，获取 FormState 实例中 results[name].nest 值. name 为 formChild 的 props.name 值。
 当 Form 和 FormControl 同时存在校验时，Form 校验的 result 结果会带上 FormControl 的结果。
 
+
 ## FormControl
 FormControl 有两种模式，一种是搜集数据模式，一种是自定义表单控件模式。详细见 FormControl 的相关实例
+从 0.2.0 开始， FormControl 组件不再支持 validator, required 属性
+
 
 ## FormField、InputField
 详细见实例
+
 
 ## ExplainBase、ExplainText 校验结果解释
 详细见实例

@@ -9,18 +9,26 @@ export default Util;
 
 
 function mergeNestedResult(parentResult, nestedResult) {
-  let merged = new vajs.Result();
-  merged.isValid = parentResult.isValid && nestedResult.isValid;
-  merged.initial = parentResult;
-  merged.nested = nestedResult;
+  if (!parentResult && !nestedResult) {
+    throw new Error('parentResult and nestedResult needed');
+  }
+  const parent = parentResult || new vajs.Result();
+  const nested = nestedResult || new vajs.Result();
 
-  if (!parentResult.isValid) {
-    merged.message = parentResult.message;
-    if (!merged.message && !nestedResult.isValid) {
-      merged.message = nestedResult.message;
+  const merged = new vajs.Result();
+  merged.isValid = parent.isValid && nested.isValid;
+  merged.value = parent.value || nested.value;
+  merged.transformed = parent.transformed || nested.transformed;
+  merged.initial = parent;
+  nestedResult && (merged.nested = nested);
+
+  if (!parent.isValid) {
+    merged.message = parent.message;
+    if (!merged.message && !nested.isValid) {
+      merged.message = nested.message;
     }
-  } else if (!nestedResult.isValid) {
-    merged.message = nestedResult.message;
+  } else if (!nested.isValid) {
+    merged.message = nested.message;
   }
   return merged;
 }

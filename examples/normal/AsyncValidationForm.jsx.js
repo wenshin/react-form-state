@@ -48,7 +48,9 @@ function remoteValidate(val) {
     if (!val) {
       return resolve(vajs.require().validate());
     }
+    // 限流延迟
     remoteValidate.timer = setTimeout(() => {
+      // 模拟远程调用
       setTimeout(() => {
         try {
           resolve(vajs.string({maxLength: 5}).validate(val));

@@ -18,6 +18,11 @@ A powerful react form support union validation and nest validation.
 
 ## Releases
 
+**0.2.2**
+
+- upgrade vajs to 1.0.3
+
+
 **0.2.1**
 
 - fix merge nested result bug

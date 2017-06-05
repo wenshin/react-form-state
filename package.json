@@ -1,6 +1,6 @@
 {
   "name": "@myfe/react-form-state",
-  "version": "0.2.1",
+  "version": "0.2.2",
   "keywords": [
     "react",
     "form",
@@ -53,6 +53,6 @@
     "classnames": "^2.2.5",
     "lodash": "^4.17.4",
     "marked": "^0.3.6",
-    "vajs": "1.0.2"
+    "vajs": "^1.0.3"
   }
 }

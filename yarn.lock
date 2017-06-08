@@ -4403,9 +4403,9 @@ v8flags@^2.0.10:
   dependencies:
     user-home "^1.1.1"
 
-vajs@^1.0.3:
-  version "1.0.3"
-  resolved "http://registry.npm.taobao.org/vajs/download/vajs-1.0.3.tgz#4a194670356f22c2fc6adc5dde6ecb5b9f951aca"
+vajs@^1.0.4:
+  version "1.0.4"
+  resolved "http://registry.npm.taobao.org/vajs/download/vajs-1.0.4.tgz#cc5089d3b9a60589726894580c7b849f09372509"
 
 validate-npm-package-license@^3.0.1:
   version "3.0.1"

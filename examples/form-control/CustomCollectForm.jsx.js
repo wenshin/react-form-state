@@ -6,26 +6,26 @@ import Markdown from '../Markdown.jsx';
 const vajs = FormState.vajs;
 
 class MyFormControl extends FormControl {
-  static validator = vajs.map({
+  _validator = vajs.map({
     foo1: vajs.number({max: 10})
   });
 
   _isCollectData = true;
 
   renderFormControl() {
-    const results = this.formNestedResult.results || {};
+    const {data, results} = this.value;
     return (
       <div>
         <div>
-          <label>foo1: <input name='foo1' /></label>
+          <label>foo1: <input name='foo1' value={data.foo1} /></label>
           <ExplainText validResult={results.foo1} defaultExplain='最大不超过10' inline />
         </div>
         <div>
-          <label>foo2: <input name='foo2' /></label>
+          <label>foo2: <input name='foo2' value={data.foo2} /></label>
           <ExplainText validResult={results.foo2} defaultExplain='可选' inline />
         </div>
         <div>
-          <label>foo3: <input name='foo3' /></label>
+          <label>foo3: <input name='foo3' value={data.foo3} /></label>
           <ExplainText validResult={results.foo3} defaultExplain='可选' inline />
         </div>
       </div>
@@ -45,8 +45,7 @@ class CustomCollectForm extends Component {
     return (
       <section>
         <Markdown>{`
-下例的 Form 功能和上一个直接使用 FormControl 采集数据的例子是一样的，
-但是代码可维护性和重用性更好。
+下例的 Form 功能也是实现上面表单相同的功能，只是通过继承对组件进行了更好的封装
         `}</Markdown>
         <Form
           state={this.formState}
@@ -65,17 +64,22 @@ export default CustomCollectForm;
 
 function createFormState(onStateChange) {
   return new FormState({
-    data: {},
+    data: {
+      collected: {data: {}, results: {}}
+    },
     validator: vajs.map({
       collected: vajs.v((val) => {
-        let result;
-        const isValid = val.foo1 && val.foo2 && val.foo3;
-        if (!isValid) {
-          result = new vajs.Result({value: val, isValid: false, message: '所有字段不能为空'});
+        const {data, isValid} = val;
+        let result = new vajs.Result({value: data});
+        const isEmpty = !data.foo1 || !data.foo2 || !data.foo3;
+        if (isEmpty) {
+          result.isValid = false;
+          result.message = '所有字段不能为空';
         } else {
-          result = new vajs.Result({value: val, isValid: true});
+          result.isValid = isValid;
+          result.message = isValid ? 'Bravo！' : '校验失败！';
         }
-        return Util.mergeNestedResult(result, MyFormControl.validator.validate(val));
+        return result;
       })
     }),
     onStateChange

@@ -8,39 +8,6 @@ import FormChild from './FormChild.jsx';
 
 const {vajs} = FormState;
 
-/**
- * 用法：
- *
- * ```
- * // 使用1：继承自定义 FormControl。便于封装 validators，达到非常好的可重用效果
- *
- * class CustomFormControl extends FormControl {
- *   static validator = vajs.map({key: vajs.require()});
- *   // 自动搜集数据
- *   _isCollectData = true;
- *
- *   handleChange = (e) => {
- *     this.triggerChange(e.target.value, e);
- *   };
- *
- *   renderFormControl() {
- *     return (
- *       <div><select></select><input onChange={this.handleChange}/></div>
- *     );
- *   }
- * }
- *
- * // 通过继承，封装 validator，并且可以重新定义 validator
- * <CustomFormControl name value />
- *
- * // 使用2：封装多个数据为对象格式。以下例子会获得 {test: {a1, a2}} 的数据结构
- * <FormControl name='test'>
- *   <input name='a1' value defaultValue />
- *   <input name='a2' value defaultValue />
- * </FormControl>
- *
- * ```
- */
 export default class FormControl extends FormChild {
   static propTypes = {
     name: PropTypes.string,
@@ -69,26 +36,47 @@ export default class FormControl extends FormChild {
 
   constructor(props) {
     super(props);
-    this._dateSet = null;
+    this._dataSetState = null;
     this._isCollectData = false;
+    this._validator = null;
+    this._initialized = false;
+  }
+
+  initState() {
+    if (this._initialized) return;
+
+    let value;
+    const {name} = this.props;
+    if (this._isCollectData) {
+      this._dataSetState = new FormState({
+        data: this.value,
+        validator: this.validator,
+        onStateChange: this.onDataSetChange
+      });
+      this.form.data[name] = this._dataSetState;
+      value = this._dataSetState;
+    } else if (this.validator) {
+      value = this.validator.validate(this.value);
+    }
+
+    if (value) {
+      this.form.data[name] = value;
+      if (value.isValid) {
+        this.form._invalidSet.delete(name);
+      } else {
+        this.form._invalidSet.add(name);
+      }
+    }
+
+    this._initialized = true;
   }
 
   get value() {
     return this.props.value || this.formValue;
   }
 
-  get result() {
-    return this.formResult;
-  }
-
-  get dataSetState() {
-    if (this._isCollectData && !this._dataSet) {
-      this._dataSet = new FormState({
-        data: this.value,
-        onStateChange: this.onDataSetChange
-      });
-    }
-    return this._dataSet;
+  get validator() {
+    return this._validator || this.props.validator;
   }
 
   pickProps() {
@@ -103,6 +91,7 @@ export default class FormControl extends FormChild {
 
   // 继承时可覆盖，设置联合校验等逻辑
   onDataSetChange = (state) => {
+    console.log('trigger change')
     this.triggerChange(state);
   }
 
@@ -113,31 +102,34 @@ export default class FormControl extends FormChild {
    * @return {undefined}
    */
   triggerChange = (value, srcEvent) => {
+    console.log('form control src event', srcEvent)
     srcEvent && srcEvent.stopPropagation && srcEvent.stopPropagation();
 
     const {_input} = this.refs;
 
     if (_input) {
-      const eventType = isInputEventSupported() ? 'input' : 'change';
+      const eventType = isInputEventSupported ? 'input' : 'change';
 
       _input.isFormControl = true;
 
       // 注意！不能用`_input.value = value`或者`_input.dataset.value = value`。
       // 赋值后值会变成`value.toString()`。
+      _input.formControlValue = value;
+
       if (this._isCollectData) {
-        _input.formControlValue = value.data;
-      } else {
-        _input.formControlValue = value;
+        this._result = value.results;
       }
 
-      // React 的 SyntheticEvent 是单例，如果执行流不中断会继续触发 srcEvent
+      console.log('fire event')
+      fireEvent(_input, eventType);
+      // React 0.14.x 的 SyntheticEvent 是单例，如果执行流不中断会继续触发 srcEvent
       //
       // !!!!这里有个很大的坑
       // 如果组件中存在 input 输入中文需求时，不能使用 stateless 组件
       // 因为 FormControl 的自定义事件是在 setTimeout 后触发的，这个阶段重置 input 的 value 属性
       // 会破坏输入法的判断，导致重复输入的问题。
       // https://segmentfault.com/q/1010000003974633
-      setTimeout(() => fireEvent(_input, eventType), 0);
+      // setTimeout(() => fireEvent(_input, eventType), 0);
     }
   };
 
@@ -146,26 +138,27 @@ export default class FormControl extends FormChild {
   }
 
   render() {
-    const {className, name, onChange, children} = this.props;
-    let customChildren = this.renderFormControl();
-
+    const {className, name, children} = this.props;
     const inputAttrs = {name, ref: '_input', type: 'text'};
-
-    const formControlAttrs = {
-      className: 'form-control ' + (className || ''),
-      onChange
-    };
+    let customChildren = this.renderFormControl();
 
     if (!customChildren && children) {
       this._isCollectData = true;
       customChildren = children;
     }
 
+    // 依赖 this._isCollectData 所以不能放在最前面
+    this.initState();
+
+    const formControlAttrs = {
+      className: 'form-control ' + (className || '')
+    };
+
     return (
       <div {...formControlAttrs}>
         <input hidden {...inputAttrs} />
         {this._isCollectData && customChildren
-          ? <DataSet state={this.dataSetState}>{customChildren}</DataSet>
+          ? <DataSet name={name} state={this._dataSetState}>{customChildren}</DataSet>
           : customChildren}
       </div>
     );

@@ -1,8 +1,10 @@
 import {Component, PropTypes} from 'react';
 import FormState from './FormState';
+import {isInputEventSupported} from './event';
 
 export default class DataSet extends Component {
   static propTypes = {
+    name: PropTypes.string,
     state: PropTypes.instanceOf(FormState).isRequired,
     children: PropTypes.oneOfType([
       PropTypes.arrayOf(PropTypes.node),
@@ -14,14 +16,24 @@ export default class DataSet extends Component {
     const data = getEventData(e);
     // 只有当存在 name 字段时才捕捉
     if (data.name) {
-      // 经过节流后，SyntheticEvent 对象会重置，不能执行 e.stopPropagation。
+      // 不用在意，目前已经不适用 React 的事件流
+      // 但是保留在这里作为知识。
+      // React 经过节流后，SyntheticEvent 对象会重置，不能执行 e.stopPropagation。
       e.stopPropagation();
       this.props.state.updateState({
         name: data.name,
         value: data.value,
-        validationResult: data.formControlResult
       });
     }
+  }
+
+  // 直接使用 React 的 onChange 监听会导致重复监听，这里还是获取原生 DOM 来监听事件
+  handleRef = (el) => {
+    let event = 'input';
+    if (!isInputEventSupported) {
+      event = 'change';
+    }
+    el.addEventListener(event, this.onChange);
   }
 
   renderChildren() {
@@ -32,7 +44,7 @@ export default class DataSet extends Component {
     const children = this.renderChildren();
     return (
       <div
-        onChange={this.onChange}
+        ref={this.handleRef}
         className='data-set'
       >
         {children}
@@ -45,15 +57,12 @@ export default class DataSet extends Component {
 function getEventData(e) {
   const {
     name, type, checked,
-    isFormControl, formControlValue, formControlResult
+    isFormControl, formControlValue
   } = e.target;
   let {value} = e.target;
+  console.log('get event data', isFormControl)
 
   value = type === 'checkbox' ? checked : value;
   value = isFormControl ? formControlValue : value;
-  return {
-    name,
-    value,
-    formControlResult
-  };
+  return {name, value};
 }

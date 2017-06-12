@@ -5,6 +5,7 @@ import Markdown, {Code} from './Markdown.jsx';
 import UnionUpdateForm from './normal/UnionUpdateForm.jsx';
 import AsyncValidationForm from './normal/AsyncValidationForm.jsx';
 import CollectForm from './form-control/CollectForm.jsx';
+import CollectForm2 from './form-control/CollectForm2.jsx';
 import CustomCollectForm from './form-control/CustomCollectForm.jsx';
 import CustomFormControlForm from './form-control/CustomFormControlForm.jsx';
 import FormFieldDisabledForm from './form-field/FormFieldDisabledForm.jsx';
@@ -26,6 +27,7 @@ function App() {
         <Markdown>{`
 # react form state
 是一个数据与 UI 分离，支持丰富的校验场景，支持轻松扩展的表单控件。
+该React 组件只适合于 Web 平台，但是 FormState 却可以用于任何 JS 运行环境。
 
 # 设计哲学
 ### UI 和 Form 数据处理逻辑分离
@@ -36,8 +38,9 @@ function App() {
 这往往发生在内网和外网同时提供服务，PC 端和移动端同时提供服务，
 我们期望表单的数据处理逻辑可以直接被复用。
 
-### 核心逻辑简单化
-从 0.2.0 开始，FormState 和 FromControl 不会自动进行嵌套校验。因为在实际应用中，很难优雅的兼顾所有场景。
+### 1.0 核心逻辑简优化
+1. 恢复 FormControl 支持 validator 自校验
+从 1.0.0 开始，FormState 和 FromControl 不会自动进行嵌套校验。因为在实际应用中，很难优雅的兼顾所有场景。
 如果你想要实现嵌套校验，你需要使用 \`import {Util} from 'react-from-state'\` 中的
 Util.mergeNestedResult 方法去实现。具体用法见 API 说明和 FormControl 的相关示例。
 当然如果 FormControl 自带一些通用的校验，你仍然可以在 FromControl 文件中维护，
@@ -83,24 +86,39 @@ Util.mergeNestedResult 方法去实现。具体用法见 API 说明和 FormContr
         <section>
           <Markdown>{`
 ### FormControl 表单元素
+FormControl 有三种模式，
+1. 收集模式，可以直接嵌套为 FormControl 的子元素，也可以通过集成实现。
+2. 控件模式，通过继承并在内部调用 \`this.triggerChange()\` 封装为一个可触发 onChange 事件的控件元素。
+3. 收集控件模式，通过继承并且设置 _isCollectData 为 true，可把数据收集为一个对象。
+
 > FormControl 不支持嵌套 FormControl
         `}</Markdown>
           <section>
-            <h4>用 FormControl 采集数据</h4>
+            <h4>FormControl 收集模式，在顶层 Form 实现校验</h4>
             <CollectForm />
             <section>
               <Code lang='jsx' code={CollectForm.srcContent} />
             </section>
           </section>
           <section>
-            <h4>继承 FormControl 封装采集数据</h4>
+            <h4>FormControl 收集模式，自带校验功能结果</h4>
+            <Markdown>{`
+
+            `}</Markdown>
+            <CollectForm2 />
+            <section>
+              <Code lang='jsx' code={CollectForm2.srcContent} />
+            </section>
+          </section>
+          <section>
+            <h4>FormControl 模式，继承 FormControl 封装采集数据</h4>
             <CustomCollectForm />
             <section>
               <Code lang='jsx' code={CustomCollectForm.srcContent} />
             </section>
           </section>
           <section>
-            <h4>继承 FormControl 自定义表单元素</h4>
+            <h4>FormControl 控件模式，继承 FormControl 自定义表单元素</h4>
             <CustomFormControlForm />
             <section>
               <Code lang='jsx' code={CustomFormControlForm.srcContent} />

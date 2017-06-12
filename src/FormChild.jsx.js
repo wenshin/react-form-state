@@ -1,5 +1,4 @@
 import {Component, PropTypes} from 'react';
-import Util from './util';
 
 /**
  * FormChild 表单元素组件的基类
@@ -31,10 +30,6 @@ export default class FormChild extends Component {
   get formResult() {
     const {name} = this.props; // eslint-disable-line react/prop-types
     return this.formResults[name];
-  }
-
-  get formNestedResult() {
-    return Util.getNestedResult(this.formResult);
   }
 
   get formValidator() {

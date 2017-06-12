@@ -1,4 +1,5 @@
 import isEventSupported from './lib/isEventSupported';
+
 /**
  * trigger a DOM event via script
  * Reference From http://darktalker.com/2010/07/manually-trigger-dom-event/
@@ -25,9 +26,6 @@ export function fireEvent(element, event, bubbling = true, cancelable = true) {
   return !element.dispatchEvent(evt);
 }
 
-export function isInputEventSupported() {
-  // **Copy From 'react/lib/ChangeEventPlugin.js'**
-  // IE9 claims to support the input event but fails to trigger it when
-  // deleting text, so we ignore its input events
-  return isEventSupported('input') && (!('documentMode' in document) || document.documentMode > 9);
-}
+
+export const isInputEventSupported = isEventSupported('input')
+  && (!('documentMode' in document) || document.documentMode > 9);

@@ -144,4 +144,31 @@ describe('FormState', () => {
 
     formState.updateState({name: 'foo', value: 2});
   });
+
+  it('async validation when edit mode', (done) => {
+    const formState = new FormState({
+      isEdit: true,
+      data: {
+        foo: 3
+      },
+      onStateChange(state) {
+        assert.ok(state.isValid);
+        assert.ok(formState.results.foo.isValid);
+        done();
+      },
+      validator: vajs.map({
+        foo: vajs.async((v) => {
+          return new Promise((resolve, reject) => {
+            if (!v) return resolve(vajs.require().validate(v));
+            setTimeout(() => {
+              resolve(vajs.number({min: 2}));
+            }, 5);
+          });
+        })
+      })
+    });
+
+    assert.ok(!formState.isValid);
+    assert.ok(!formState.results.foo.isValid);
+  });
 });

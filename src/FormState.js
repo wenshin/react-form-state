@@ -38,7 +38,7 @@ class FormState {
       const result = mapResult.results[name];
       // 不记录校验成功的参数
       if (!result.isValid) {
-        // 编辑模式保存所有校验信息，
+        // 编辑模式保存所有校验信息
         // 非编辑模式，不保存校验信息，只让 isValid 生效
         if (this.isEdit) {
           this.results[name] = result;
@@ -57,7 +57,9 @@ class FormState {
       .then((res) => {
         if (this.isEdit) {
           this.results[name] = res;
-        } else if (res.isValid) {
+        }
+
+        if (res.isValid) {
           this._invalidSet.delete(name);
         } else {
           this._invalidSet.add(name);

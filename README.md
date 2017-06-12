@@ -1,6 +1,7 @@
 ## react-form-state
 
 A powerful react form support union validation and nest validation.
+Not Spport React Native.
 
 ## Features
 
@@ -18,8 +19,10 @@ A powerful react form support union validation and nest validation.
 
 ## Releases
 
-**0.2.4**
+**1.0.0**
+> this is a break change version
 
+- refactor the FormControl and event listener
 - fix async validation error
 
 **0.2.3**

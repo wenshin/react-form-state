@@ -18,6 +18,10 @@ A powerful react form support union validation and nest validation.
 
 ## Releases
 
+**0.2.4**
+
+- fix async validation error
+
 **0.2.3**
 
 - upgrade vajs to 1.0.4, remove Proxy dependency

@@ -126,6 +126,8 @@ class FormState {
           .then(res => this._updateResult(name, res))
           .catch(err => this._onUnhandledRejection(err, name, result.value));
       }
+    } else if (value instanceof FormState || isResult(value)) {
+      result = value;
     }
     return this._updateResult(name, result);
   }
@@ -153,7 +155,14 @@ FormState.vajs = vajs;
 
 module.exports = FormState;
 
+function isResult(result) {
+  let isResult = result
+    && typeof result === 'object'
+    && 'value' in result;
 
-function isSingleResult(result) {
-  return result instanceof vajs.Result && typeof result.message === 'string';
+  if (!result.isValid) {
+    isResult = isResult
+      && ('message' in result || 'results' in result);
+  }
+  return isResult;
 }

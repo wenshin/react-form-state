@@ -62,6 +62,77 @@ describe('FormState', () => {
     formState.updateState({name: 'foo', value: 1});
   });
 
+  it('FormState.updateState with value is FormState instance', (done) => {
+    const subFormState = new FormState({
+      data: {foo: 10, bar: 2},
+      validator: vajs.map({
+        foo: vajs.number({max: 5}),
+        bar: vajs.number({max: 12})
+      })
+    });
+
+    const formState = new FormState({
+      data: {foo: null},
+      onStateChange(state) {
+        assert.ok(!state.isValid);
+        assert.ok(state.data.foo === subFormState);
+        assert.ok(state.results.foo === subFormState);
+        done();
+      }
+    });
+
+    formState.updateState({name: 'foo', value: subFormState});
+  });
+
+  it('FormState.updateState with value is vajs.Result', (done) => {
+    const v = vajs.number({max: 5});
+    const mv = vajs.map({
+      foo: vajs.number({max: 5}),
+      bar: vajs.number({max: 12})
+    });
+
+    const subResultInvalid = v.validate(10);
+    const subResultValid = v.validate(2);
+    const subMapResultInvalid = mv.validate({foo: 10});
+    const subMapResultValid = mv.validate({foo: 4, bar: 4});
+
+    const states = [];
+    const formState = new FormState({
+      data: {foo: null},
+      onStateChange(state) {
+        states.push({
+          isValid: state.isValid,
+          data: {foo: state.data.foo},
+          results: {foo: state.results.foo}
+        });
+        if (states.length === 4) {
+          assert.ok(!states[0].isValid);
+          assert.ok(states[0].data.foo === subResultInvalid);
+          assert.ok(states[0].results.foo === subResultInvalid);
+
+          assert.ok(states[1].isValid);
+          assert.ok(states[1].data.foo === subResultValid);
+          assert.ok(states[1].results.foo === subResultValid);
+
+          assert.ok(!states[2].isValid);
+          assert.ok(states[2].data.foo === subMapResultInvalid);
+          assert.ok(states[2].results.foo === subMapResultInvalid);
+
+          assert.ok(states[3].isValid);
+          assert.ok(states[3].data.foo === subMapResultValid);
+          assert.ok(states[3].results.foo === subMapResultValid);
+
+          done();
+        }
+      }
+    });
+
+    formState.updateState({name: 'foo', value: subResultInvalid});
+    formState.updateState({name: 'foo', value: subResultValid});
+    formState.updateState({name: 'foo', value: subMapResultInvalid});
+    formState.updateState({name: 'foo', value: subMapResultValid});
+  });
+
   it('joint no update validation', () => {
     const formState = new FormState({
       data: {foo: 1, bar: 2},

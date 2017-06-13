@@ -10,7 +10,7 @@ export default class FormChild extends Component {
   };
 
   get form() {
-    const {form} = this.context;
+    const {form} = this.context || {};
     return form || {};
   }
 

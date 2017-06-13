@@ -11,16 +11,14 @@ const {vajs} = FormState;
 export default class FormControl extends FormChild {
   static propTypes = {
     name: PropTypes.string,
+    onChange: PropTypes.func,
+    validator: PropTypes.object,
     // 设置 defaultValue 表示把组件声明成 uncontrolled 组件
     // 注意，defaultValue 和 value 只使用其中一个
     defaultValue: PropTypes.any,
     // 设置 value 表示把组件声明成 controlled 组件
     value: PropTypes.any
   };
-
-  static defaultProps = {
-    defaultValue: null
-  }
 
   /**
    * 扩展 FormControl 的静态对象属性，比如 propTypes, defaultProps
@@ -34,14 +32,16 @@ export default class FormControl extends FormChild {
 
   constructor(props) {
     super(props);
-    this._state = null;
+    this._collectState = null;
     this._isCollectData = false;
+    // 缓存首次校验的 value 值
+    this._value = null;
     this._validator = null;
     this._initialized = false;
   }
 
   get value() {
-    return this.props.value || this.formValue;
+    return this.props.value || this.formValue || this._value;
   }
 
   get validator() {
@@ -57,11 +57,12 @@ export default class FormControl extends FormChild {
     return this.props.validator || this._validator;
   }
 
+  // 给子类继承时使用的工具函数
   pickProps() {
     const {defaultValue} = this.props;
     // React 要求 value 和 defaultValue 只能有一个。。。
-    if (defaultValue) {
-      return _omit(this.props, ['validator']);
+    if (defaultValue !== undefined) {
+      return _omit(this.props, ['value', 'validator']);
     } else {
       return _omit(this.props, ['validator', 'defaultValue']);
     }
@@ -73,26 +74,22 @@ export default class FormControl extends FormChild {
     let value;
     const {name} = this.props;
     if (this._isCollectData) {
-      this._state = new FormState({
+      this._collectState = new FormState({
         data: (this.value && this.value.data) || {},
         validator: this.validator,
         onStateChange: this.onStateChange
       });
-      this.form.data[name] = this._state;
-      value = this._state;
+      value = this._collectState;
     } else if (this.validator) {
       value = this.validator.validate(this.value);
     }
 
-    if (value) {
-      this.form.data[name] = value;
-      if (value.isValid) {
-        this.form._invalidSet.delete(name);
-      } else {
-        this.form._invalidSet.add(name);
-      }
+    // 更新 Form 的状态
+    if (value && this.form && this.form.update) {
+      this.form.update({name, value});
     }
 
+    this._value = value;
     this._initialized = true;
   }
 
@@ -109,6 +106,11 @@ export default class FormControl extends FormChild {
    */
   triggerChange = (value, srcEvent) => {
     srcEvent && srcEvent.stopPropagation && srcEvent.stopPropagation();
+
+    if (this.props.onChange) {
+      this.props.onChange(value);
+      return;
+    }
 
     const {_input} = this.refs;
 
@@ -167,7 +169,7 @@ export default class FormControl extends FormChild {
             <Form
               name={name}
               className='form-control-state'
-              state={this._state}
+              state={this._collectState}
             >{customChildren}</Form>
           ) : customChildren}
       </div>

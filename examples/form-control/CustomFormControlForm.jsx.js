@@ -38,12 +38,14 @@ class CustomFormControlForm extends Component {
       <section>
         <Markdown>{`
 在现实场景中，很多复杂组件并不是简单使用原生的 control 元素就可以实现功能，
-这时我们一般会对其进行封装，并暴露出 API （如：onChange，但是参数并不是 Event 对象），
+我们一般会将其封装并暴露出 API （如：onChange，但是参数并不是 Event 对象）。
+但是这会绑定很多事件，尤其是当表单很复杂的时候，这种场景会很难维护。
+这时我们希望自定义控件，并且能够多处使用。
+
 这是我们可以通过 FormControl.triggerChange 方法让其支持事件冒泡。
+在此
         `}</Markdown>
-        <Form
-          state={this.formState}
-        >
+        <Form state={this.formState}>
           <FormField name='foo' label='我的数据' isExplainInline={false}>
             <MyFormControl name='foo' />
           </FormField>
@@ -61,15 +63,6 @@ function createFormState(onStateChange) {
     data: {
       foo: {value: null}
     },
-    validator: vajs.map({
-      foo: vajs.v((val) => {
-        const {value, isValid} = val;
-        if (!isValid) return val;
-        const result = vajs.number({max: 0.5}).validate(value);
-        if (!result.isValid) return result;
-        return true;
-      })
-    }),
     onStateChange
   });
 }

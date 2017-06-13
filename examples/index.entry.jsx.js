@@ -7,6 +7,7 @@ import AsyncValidationForm from './normal/AsyncValidationForm.jsx';
 import CollectForm from './form-control/CollectForm.jsx';
 import CollectForm2 from './form-control/CollectForm2.jsx';
 import CustomCollectForm from './form-control/CustomCollectForm.jsx';
+import FormControlUseWithoutForm from './form-control/FormControlUseWithoutForm.jsx';
 import CustomFormControlForm from './form-control/CustomFormControlForm.jsx';
 import FormFieldDisabledForm from './form-field/FormFieldDisabledForm.jsx';
 import FormFooterField from './FormFooterField.jsx';
@@ -136,6 +137,13 @@ FormControl 有三种模式：
             <CustomFormControlForm />
             <section>
               <Code lang='jsx' code={CustomFormControlForm.srcContent} />
+            </section>
+          </section>
+          <section>
+            <h4>FormControl 控件模式，不在 Form 中使用 FormControl</h4>
+            <FormControlUseWithoutForm />
+            <section>
+              <Code lang='jsx' code={FormControlUseWithoutForm.srcContent} />
             </section>
           </section>
         </section>

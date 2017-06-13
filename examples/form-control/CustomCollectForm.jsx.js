@@ -17,6 +17,12 @@ class MyFormControl extends FormControl {
 
   _isCollectData = true;
 
+  // 可自定义逻辑
+  // onStateChange = (state) => {
+  //   // do some special update
+  //   this.triggerChange(state)
+  // }
+
   renderFormControl() {
     const {data, results} = this.value;
     return (

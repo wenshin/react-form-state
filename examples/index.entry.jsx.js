@@ -200,13 +200,11 @@ FormState 实例化时会执行一次全量的校验，但是并不会把结果�
 校验指定数据，适合用于数据不更新只是校验，参数同 \`updateState\`。
 如果 value 属性不存在于参数对象时，认为使用当前保存的值进行校验。
 
-## DataSet
-DataSet 实现了监听 onChange 事件冒泡的逻辑，调用 props.state.updateState 进行数据更新。
-是用于实现 Form 和 FormControl 搜集数据功能的核心功能。
-
 
 ## Form
-Form 组件是搜集整个表单的数据的根节点。props.state 必须是 FormState 实例。继承自 DataSet 类
+Form 组件是搜集整个表单的数据的根节点。props.state 必须是 FormState 实例。
+DataSet 实现了监听 onChange 事件冒泡的逻辑，调用 props.state.updateState 进行数据更新。
+是用于实现 Form 和 FormControl 搜集数据功能的核心功能。
 
 
 ## FormChild

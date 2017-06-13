@@ -3,7 +3,7 @@ import {PropTypes} from 'react';
 import {fireEvent, isInputEventSupported} from './event';
 import FormState from './FormState';
 
-import DataSet from './DataSet.jsx';
+import Form from './Form.jsx';
 import FormChild from './FormChild.jsx';
 
 const {vajs} = FormState;
@@ -34,39 +34,10 @@ export default class FormControl extends FormChild {
 
   constructor(props) {
     super(props);
-    this._dataSetState = null;
+    this._state = null;
     this._isCollectData = false;
     this._validator = null;
     this._initialized = false;
-  }
-
-  initState() {
-    if (this._initialized) return;
-
-    let value;
-    const {name} = this.props;
-    if (this._isCollectData) {
-      this._dataSetState = new FormState({
-        data: (this.value && this.value.data) || {},
-        validator: this.validator,
-        onStateChange: this.onDataSetChange
-      });
-      this.form.data[name] = this._dataSetState;
-      value = this._dataSetState;
-    } else if (this.validator) {
-      value = this.validator.validate(this.value);
-    }
-
-    if (value) {
-      this.form.data[name] = value;
-      if (value.isValid) {
-        this.form._invalidSet.delete(name);
-      } else {
-        this.form._invalidSet.add(name);
-      }
-    }
-
-    this._initialized = true;
   }
 
   get value() {
@@ -96,14 +67,43 @@ export default class FormControl extends FormChild {
     }
   }
 
+  initState() {
+    if (this._initialized) return;
+
+    let value;
+    const {name} = this.props;
+    if (this._isCollectData) {
+      this._state = new FormState({
+        data: (this.value && this.value.data) || {},
+        validator: this.validator,
+        onStateChange: this.onStateChange
+      });
+      this.form.data[name] = this._state;
+      value = this._state;
+    } else if (this.validator) {
+      value = this.validator.validate(this.value);
+    }
+
+    if (value) {
+      this.form.data[name] = value;
+      if (value.isValid) {
+        this.form._invalidSet.delete(name);
+      } else {
+        this.form._invalidSet.add(name);
+      }
+    }
+
+    this._initialized = true;
+  }
+
   // 继承时可覆盖，设置联合校验等逻辑
-  onDataSetChange = (state) => {
+  onStateChange = (state) => {
     this.triggerChange(state);
   }
 
   /**
    * 自主触发
-   * @param  {Any}          value        dataset 数据`{data, isValid, result}`或者其它数据
+   * @param  {Any}          value        dataset 数据`{data, isValid, results}`或者其它数据
    * @param  {DomEventLike} srcEvent     原始对象
    * @return {undefined}
    */
@@ -163,8 +163,13 @@ export default class FormControl extends FormChild {
       <div {...formControlAttrs}>
         <input hidden {...inputAttrs} />
         {this._isCollectData && customChildren
-          ? <DataSet name={name} state={this._dataSetState}>{customChildren}</DataSet>
-          : customChildren}
+          ? (
+            <Form
+              name={name}
+              className='form-control-state'
+              state={this._state}
+            >{customChildren}</Form>
+          ) : customChildren}
       </div>
     );
   }

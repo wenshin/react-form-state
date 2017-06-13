@@ -1,7 +1,6 @@
 import Explain from './Explain';
 import FormState from './FormState';
 
-import DataSet from './DataSet.jsx';
 import Form from './Form.jsx';
 import ExplainBase from './ExplainBase.jsx';
 import ExplainText from './ExplainText.jsx';
@@ -17,7 +16,6 @@ export default Form;
 export {
   FormState,
 
-  DataSet,
   Explain,
   ExplainBase,
   ExplainText,

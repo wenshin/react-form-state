@@ -15,12 +15,10 @@ export default class FormControl extends FormChild {
     // 注意，defaultValue 和 value 只使用其中一个
     defaultValue: PropTypes.any,
     // 设置 value 表示把组件声明成 controlled 组件
-    value: PropTypes.any,
-    onChange: PropTypes.func
+    value: PropTypes.any
   };
 
   static defaultProps = {
-    onChange: null,
     defaultValue: null
   }
 
@@ -76,7 +74,16 @@ export default class FormControl extends FormChild {
   }
 
   get validator() {
-    return this._validator || this.props.validator;
+    if (this._isCollectData
+      && this._validator
+      && this._validator.size
+      && this.props.validator
+      && this.props.validator.size
+    ) {
+      this._validator.merge(this.props.validator);
+      return this._validator;
+    }
+    return this.props.validator || this._validator;
   }
 
   pickProps() {

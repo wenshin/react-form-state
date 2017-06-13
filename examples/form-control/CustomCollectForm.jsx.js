@@ -5,9 +5,14 @@ import Markdown from '../Markdown.jsx';
 
 const vajs = FormState.vajs;
 
+// 自动合并 vajs.map() 返回 validator
+const customValidator = vajs.map({
+  foo2: vajs.number({max: 5}),
+});
+
 class MyFormControl extends FormControl {
   _validator = vajs.map({
-    foo1: vajs.number({max: 10})
+    foo1: vajs.number({max: 10}),
   });
 
   _isCollectData = true;
@@ -22,7 +27,7 @@ class MyFormControl extends FormControl {
         </div>
         <div>
           <label>foo2: <input name='foo2' value={data.foo2} /></label>
-          <ExplainText validResult={results.foo2} defaultExplain='可选' inline />
+          <ExplainText validResult={results.foo2} defaultExplain='我是自定义的校验规则' inline />
         </div>
         <div>
           <label>foo3: <input name='foo3' value={data.foo3} /></label>
@@ -45,13 +50,13 @@ class CustomCollectForm extends Component {
     return (
       <section>
         <Markdown>{`
-下例的 Form 功能也是实现上面表单相同的功能，只是通过继承对组件进行了更好的封装
+下例的 Form 功能通过继承对组件进行了更好的封装，同时展示了如果是收集模式，可以对 validator 进行合并
         `}</Markdown>
         <Form
           state={this.formState}
         >
           <FormField name='collected' label='收集数据' isExplainInline={false}>
-            <MyFormControl />
+            <MyFormControl validator={customValidator} />
           </FormField>
           <FormFooterField />
         </Form>

@@ -86,15 +86,26 @@ FormControl 上报的结果就是校验结果。因此也就去掉 Util.mergeNes
         <section>
           <Markdown>{`
 ### FormControl 表单元素
-FormControl 有三种模式，
-1. 收集模式，可以直接嵌套为 FormControl 的子元素，也可以通过集成实现。
-2. 控件模式，通过继承并在内部调用 \`this.triggerChange()\` 封装为一个可触发 onChange 事件的控件元素。
-3. 收集控件模式，通过继承并且设置 _isCollectData 为 true，可把数据收集为一个对象。
+FormControl 默认接受的属性有 \`name\`, \`value\`, \`defaultValue\`, \`validator\`。
 
-> 当 FormControl 带有 validator 时，上报 Form 的数据格式会不是存粹的数据。
-> 如果是收集模式，则上报有一个 FromState 的实例，
-> 如果是简单空间模式，则上传 vajs.Result 或者 vajs.MapResult 实例。
-> 所以在给 FormState 设置初始值时，你需要传入值为 \`{value: null}\` 或者 \`{data: {}}\`
+FormControl 有三种模式：
+1. **收集模式**，可以直接嵌套为 FormControl 的子元素，也可以通过集成实现。
+2. **控件模式**，通过继承并在内部调用 \`this.triggerChange()\` 封装为一个可触发 onChange 事件的控件元素。
+3. **收集控件模式**，通过继承并且设置 _isCollectData 为 true，可把数据收集为一个对象。
+
+#### 三种校验设置方法
+1. **Form 校验**。在 Form 的 FormState 实例化时设置；
+2. **FormControl 自带校验**。继承 FormControl 时设置 _validator 属性；
+3. **FormControl 传入校验**。给 FormControl 传入 validator 属性；
+
+当 FormControl 自带校验或者传入校验都存在时，会判断是否是**收集模式**。
+如果是，则会合并两个校验；如果不是则优先使用传入的校验。
+
+当 FormControl 自带校验或者传入校验，FormControl 上报 Form 的数据格式会不是存粹的数据。
+如果是**收集模式**，则上报有一个 FromState 的实例，
+如果是**控件模式**，则上传 vajs.Result 或者 vajs.MapResult 实例。
+因此在给 FormState 设置初始值时，
+你需要传入值是 \`{value: null}\` 或者 \`{data: {}}\` 的格式。
         `}</Markdown>
           <section>
             <h4>FormControl 收集模式，在顶层 Form 实现校验</h4>

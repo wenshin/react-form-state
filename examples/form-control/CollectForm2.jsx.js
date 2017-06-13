@@ -6,9 +6,7 @@ import Markdown from '../Markdown.jsx';
 const vajs = FormState.vajs;
 
 const formCtrlValidator = vajs.map({
-  foo1: vajs.number({max: 10}),
-  foo2: vajs.require(false),
-  foo3: vajs.require(false),
+  foo1: vajs.number({max: 10})
 });
 
 class CollectForm extends Component {

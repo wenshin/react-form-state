@@ -60,7 +60,6 @@ function getEventData(e) {
     isFormControl, formControlValue
   } = e.target;
   let {value} = e.target;
-  console.log('get event data', isFormControl)
 
   value = type === 'checkbox' ? checked : value;
   value = isFormControl ? formControlValue : value;

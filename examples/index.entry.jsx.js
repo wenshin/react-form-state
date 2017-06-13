@@ -39,12 +39,12 @@ function App() {
 我们期望表单的数据处理逻辑可以直接被复用。
 
 ### 1.0 核心逻辑简优化
-1. 恢复 FormControl 支持 validator 自校验
-从 1.0.0 开始，FormState 和 FromControl 不会自动进行嵌套校验。因为在实际应用中，很难优雅的兼顾所有场景。
-如果你想要实现嵌套校验，你需要使用 \`import {Util} from 'react-from-state'\` 中的
-Util.mergeNestedResult 方法去实现。具体用法见 API 说明和 FormControl 的相关示例。
-当然如果 FormControl 自带一些通用的校验，你仍然可以在 FromControl 文件中维护，
-一般可以是 FormControl 类的静态方法。
+
+从 1.0.0 开始，恢复 FormControl 支持 validator 自校验，
+但是和以前 0.1.x 和 0.2.3 版本不同，不再需要处理令人厌烦的嵌套校验结果了，
+FormControl 上报的结果就是校验结果。因此也就去掉 Util.mergeNestedResult 和 Util.getNestedResult 方法。
+虽然这一切都很美好，也引入了一点小小的问题，在初始化 FormState 并设置 data 属性时，
+你需要设置属性值为 \`{value: null}\` 或者 \`{data: {}}\`
 
 ### 样式最简
 现实中，很多业务没有办法直接使用固定的样式，如果组件提供复杂的样式实现，将很大概率导致样式冲突。
@@ -91,7 +91,10 @@ FormControl 有三种模式，
 2. 控件模式，通过继承并在内部调用 \`this.triggerChange()\` 封装为一个可触发 onChange 事件的控件元素。
 3. 收集控件模式，通过继承并且设置 _isCollectData 为 true，可把数据收集为一个对象。
 
-> FormControl 不支持嵌套 FormControl
+> 当 FormControl 带有 validator 时，上报 Form 的数据格式会不是存粹的数据。
+> 如果是收集模式，则上报有一个 FromState 的实例，
+> 如果是简单空间模式，则上传 vajs.Result 或者 vajs.MapResult 实例。
+> 所以在给 FormState 设置初始值时，你需要传入值为 \`{value: null}\` 或者 \`{data: {}}\`
         `}</Markdown>
           <section>
             <h4>FormControl 收集模式，在顶层 Form 实现校验</h4>
@@ -150,15 +153,6 @@ FormControl 有三种模式，
 # API
 reat-form-state 依赖 [vajs@^1.0.2](https://github.com/wenshin/vajs)，
 推荐通过 FormState.vajs 获取而不是直接依赖。
-
-## Util
-从 0.2.0 开始引入
-
-### Util.mergeNestedResult(parentResult, nestedResult)
-
-- **parentResult**，一般是父级校验结果
-- **nestedResult**，需要嵌套到新的结果中的校验结果
-
 
 ## FormState
 FormState 是一个纯 JS 类，负责处理表单状态变化。

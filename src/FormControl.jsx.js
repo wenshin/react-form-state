@@ -91,7 +91,6 @@ export default class FormControl extends FormChild {
 
   // 继承时可覆盖，设置联合校验等逻辑
   onDataSetChange = (state) => {
-    console.log('trigger change')
     this.triggerChange(state);
   }
 
@@ -102,7 +101,6 @@ export default class FormControl extends FormChild {
    * @return {undefined}
    */
   triggerChange = (value, srcEvent) => {
-    console.log('form control src event', srcEvent)
     srcEvent && srcEvent.stopPropagation && srcEvent.stopPropagation();
 
     const {_input} = this.refs;
@@ -116,12 +114,12 @@ export default class FormControl extends FormChild {
       // 赋值后值会变成`value.toString()`。
       _input.formControlValue = value;
 
-      if (this._isCollectData) {
-        this._result = value.results;
+      if (!this._isCollectData && this.validator) {
+        _input.formControlValue = this.validator.validate(value);
       }
 
-      console.log('fire event')
       fireEvent(_input, eventType);
+      // 以下代码已经废弃，留作知识保留
       // React 0.14.x 的 SyntheticEvent 是单例，如果执行流不中断会继续触发 srcEvent
       //
       // !!!!这里有个很大的坑

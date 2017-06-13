@@ -24,6 +24,8 @@ Not Spport React Native.
 
 - refactor the FormControl and event listener
 - remove Util.mergeNestedResult and Util.getNestedResult
+- remove DataSet
+- update vajs to 1.0.5 which fix some bugs
 - fix async validation error
 
 **0.2.3**

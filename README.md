@@ -23,6 +23,7 @@ Not Spport React Native.
 > this is a break change version
 
 - refactor the FormControl and event listener
+- remove Util.mergeNestedResult and Util.getNestedResult
 - fix async validation error
 
 **0.2.3**

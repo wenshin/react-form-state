@@ -47,7 +47,7 @@ export default class FormControl extends FormChild {
     const {name} = this.props;
     if (this._isCollectData) {
       this._dataSetState = new FormState({
-        data: this.value,
+        data: (this.value && this.value.data) || {},
         validator: this.validator,
         onStateChange: this.onDataSetChange
       });

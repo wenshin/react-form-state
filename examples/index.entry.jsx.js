@@ -110,9 +110,9 @@ FormControl 有三种模式：
         `}</Markdown>
           <section>
             <h4>FormControl 收集模式，在顶层 Form 实现校验</h4>
-            <CollectForm />
+            <CollectForm2 />
             <section>
-              <Code lang='jsx' code={CollectForm.srcContent} />
+              <Code lang='jsx' code={CollectForm2.srcContent} />
             </section>
           </section>
           <section>
@@ -120,16 +120,9 @@ FormControl 有三种模式：
             <Markdown>{`
 
             `}</Markdown>
-            <CollectForm2 />
+            <CollectForm />
             <section>
-              <Code lang='jsx' code={CollectForm2.srcContent} />
-            </section>
-          </section>
-          <section>
-            <h4>FormControl 模式，继承 FormControl 封装采集数据</h4>
-            <CustomCollectForm />
-            <section>
-              <Code lang='jsx' code={CustomCollectForm.srcContent} />
+              <Code lang='jsx' code={CollectForm.srcContent} />
             </section>
           </section>
           <section>
@@ -137,6 +130,13 @@ FormControl 有三种模式：
             <CustomFormControlForm />
             <section>
               <Code lang='jsx' code={CustomFormControlForm.srcContent} />
+            </section>
+          </section>
+          <section>
+            <h4>FormControl 收集控件模式，继承 FormControl 封装采集数据</h4>
+            <CustomCollectForm />
+            <section>
+              <Code lang='jsx' code={CustomCollectForm.srcContent} />
             </section>
           </section>
           <section>

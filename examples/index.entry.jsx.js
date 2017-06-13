@@ -45,7 +45,7 @@ function App() {
 但是和以前 0.1.x 和 0.2.3 版本不同，不再需要处理令人厌烦的嵌套校验结果了，
 FormControl 上报的结果就是校验结果。因此也就去掉 Util.mergeNestedResult 和 Util.getNestedResult 方法。
 虽然这一切都很美好，也引入了一点小小的问题，在初始化 FormState 并设置 data 属性时，
-你需要设置属性值为 \`{value: null}\` 或者 \`{data: {}}\`
+你需要设置属性值为 \`{value: null}\` 或者 \`{data: {}}\`，这点需要特别注意！
 
 ### 样式最简
 现实中，很多业务没有办法直接使用固定的样式，如果组件提供复杂的样式实现，将很大概率导致样式冲突。

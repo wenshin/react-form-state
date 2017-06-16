@@ -3,6 +3,7 @@ import React, {PropTypes, Children, cloneElement} from 'react';
 import ExplainText from './ExplainText.jsx';
 import FormChild from './FormChild.jsx';
 
+const noop = () => {};
 
 export default class FormField extends FormChild {
   static propTypes = {
@@ -108,7 +109,7 @@ export default class FormField extends FormChild {
     // 注意 input，textarea 等内置元素，动态添加 props，React 15 加了一些警告提示
     if (Children.count(children) === 1 && typeof children === 'object') {
       const props = this.formValue === undefined ? {} : {value: this.formValue};
-      props.onChange = children.props.onChange;
+      props.onChange = children.props.onChange || noop;
       props.required = children.props.required || required;
       if (name) props.name = name;
 

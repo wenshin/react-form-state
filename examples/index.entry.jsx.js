@@ -52,6 +52,10 @@ FormControl 上报的结果就是校验结果。因此也就去掉 Util.mergeNes
 
 ### 事件冒泡
 使用 onChange 事件冒泡自动搜集数据，去掉 React 在复杂表单中频繁的事件绑定，以及双向绑定中的额外函数绑定。
+
+### 不支持的特性
+目前不支持自动收集 contentEditable 的元素，因为在自动刷新 contentEditable 元素时会丢失 Cursor 的焦点。
+因此你需要在 contentEditable 元素编辑完后再去获取编辑好的内容，可参考下面第一个例子。
         `}</Markdown>
       </section>
 

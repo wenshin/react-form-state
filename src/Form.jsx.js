@@ -2,6 +2,9 @@ import {Component, PropTypes} from 'react';
 import FormState from './FormState';
 import {isInputEventSupported} from './event';
 
+const tagsHaveInputEvent = ['input', 'select', 'textarea'];
+const inputTypesUsingClickEvent = ['checkbox', 'radio'];
+
 export default class Form extends Component {
   static propTypes = {
     className: PropTypes.string,
@@ -39,13 +42,32 @@ export default class Form extends Component {
     }
   }
 
+  onInput = (e) => {
+    const el = e.target;
+    const tagName = el.tagName.toLowerCase();
+    const isHaveInputEvent = el.contentEditable === 'true' || (
+      tagsHaveInputEvent.indexOf(tagName) > -1
+        && inputTypesUsingClickEvent.indexOf(el.type) === -1
+    );
+    if (isInputEventSupported && isHaveInputEvent) {
+      this.onChange(e);
+    }
+  }
+
+  onClick = (e) => {
+    const el = e.target;
+    const tagName = el.tagName.toLowerCase();
+    if (tagName === 'input' && inputTypesUsingClickEvent.indexOf(el.type) > -1) {
+      this.onChange(e);
+    }
+  }
+
   // 直接使用 React 的 onChange 监听会导致重复监听，这里还是获取原生 DOM 来监听事件
   handleRef = (el) => {
-    let event = 'input';
-    if (!isInputEventSupported) {
-      event = 'change';
-    }
-    el.addEventListener(event, this.onChange);
+    if (!el) return;
+    el.addEventListener('change', this.onChange);
+    el.addEventListener('input', this.onInput);
+    el.addEventListener('click', this.onClick);
   }
 
   render() {
@@ -64,12 +86,18 @@ export default class Form extends Component {
 
 function getEventData(e) {
   const {
-    name, type, checked,
-    isFormControl, formControlValue
+    type, checked,
+    isFormControl, formControlValue,
+    contentEditable
   } = e.target;
-  let {value} = e.target;
+  let {name, value} = e.target;
 
+  name = name || e.target.getAttribute('name');
   value = type === 'checkbox' ? checked : value;
   value = isFormControl ? formControlValue : value;
+
+  if (contentEditable === 'true') {
+    value = e.target.innerHTML;
+  }
   return {name, value};
 }

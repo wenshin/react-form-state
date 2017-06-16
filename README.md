@@ -10,6 +10,7 @@ Not Spport React Native.
 3. collect data into object
 4. union validation
 5. collect data with onChange bubble
+6. support IE9+
 
 
 ## docs

@@ -109,7 +109,11 @@ export default class FormField extends FormChild {
     // 注意 input，textarea 等内置元素，动态添加 props，React 15 加了一些警告提示
     if (Children.count(children) === 1 && typeof children === 'object') {
       const props = this.formValue === undefined ? {} : {value: this.formValue};
-      props.onChange = children.props.onChange || noop;
+      // React 会提示如果设置了 value 却不设置 onChange 会强制设置为 ReadOnly
+      const needOnChangeType = ['input', 'select', 'textarea'];
+      if (needOnChangeType.indexOf(children.type) > -1) {
+        props.onChange = children.props.onChange || noop;
+      }
       props.required = children.props.required || required;
       if (name) props.name = name;
 

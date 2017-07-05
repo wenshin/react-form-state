@@ -242,4 +242,25 @@ describe('FormState', () => {
     assert.ok(!formState.isValid);
     assert.ok(!formState.results.foo.isValid);
   });
+
+  it('should async update validator', () => {
+    const formState = new FormState({
+      data: {
+        foo: 3,
+        bar: 2
+      },
+      validator: vajs.map({
+        foo: vajs.number({max: 5}),
+        bar: vajs.number({max: 3}),
+      })
+    });
+
+    assert.ok(formState.isValid);
+    formState.updateValidator(vajs.map({
+      foo: vajs.number({max: 1}),
+      bar: vajs.number({max: 1}),
+    }));
+    assert.ok(!formState.isValid);
+    assert.equal(Object.keys(formState.results).length, 2)
+  });
 });

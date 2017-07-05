@@ -11,7 +11,7 @@ class FormState {
     this.isEdit = options.isEdit;
     this.nameChanged = '';
 
-    this.init();
+    this.init(this.isEdit);
   }
 
   get isValid() {
@@ -22,7 +22,7 @@ class FormState {
     return !Object.keys(this.data).length;
   }
 
-  init() {
+  init(keepResults) {
     this.results = {};
     this._invalidSet = new Set();
 
@@ -40,7 +40,7 @@ class FormState {
       if (!result.isValid) {
         // 编辑模式保存所有校验信息
         // 非编辑模式，不保存校验信息，只让 isValid 生效
-        if (this.isEdit) {
+        if (keepResults) {
           this.results[name] = result;
         }
         if (result.promise) {
@@ -67,6 +67,14 @@ class FormState {
         this._triggerStateChange();
       })
       .catch(err => this._onUnhandledRejection(err, name, result.value));
+  }
+
+  /**
+   * 动态更新 validator，可用于动态切换校验方式
+   */
+  updateValidator(validator) {
+    this.validator = validator;
+    this.init(true);
   }
 
   /**

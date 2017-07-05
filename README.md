@@ -20,6 +20,10 @@ Not Spport React Native.
 
 ## Releases
 
+**1.1.0**
+> upgrade vajs
+> Add updateValidator api
+
 **1.0.0**
 > this is a break change version
 

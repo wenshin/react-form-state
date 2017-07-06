@@ -20,6 +20,9 @@ Not Spport React Native.
 
 ## Releases
 
+**1.1.1**
+> refactor Form and FormControl
+
 **1.1.0**
 > upgrade vajs
 > Add updateValidator api

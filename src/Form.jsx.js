@@ -3,6 +3,11 @@ import FormState from './FormState';
 
 const tagsHaveInputEvent = ['input', 'select', 'textarea'];
 const inputTypesUsingClickEvent = ['checkbox', 'radio'];
+const userAgent = navigator && navigator.userAgent;
+const IS_IE = navigator
+  && navigator.userAgent
+  // IE11 useragent 不再使用 MSIE 而是使用 Trident 引擎名
+  && (navigator.userAgent.indexOf('MSIE') > -1 || navigator.userAgent.indexOf('Trident') > -1);
 
 export default class Form extends Component {
   static propTypes = {
@@ -44,7 +49,7 @@ export default class Form extends Component {
   onInput = (e) => {
     // contenteditable element will not trigger onChange event
     // IE10、11 也不会触发 input 事件
-    if (navigator.userAgent.indexOf('MSIE') === -1) {
+    if (!IS_IE) {
       if (e.target.contentEditable === 'true') {
         this.onChange(e);
       }
@@ -52,7 +57,7 @@ export default class Form extends Component {
   }
 
   onKeyUp = (e) => {
-    if (navigator.userAgent.indexOf('MSIE') > -1) {
+    if (IS_IE) {
       if (e.target.contentEditable === 'true') {
         this.onChange(e);
       }

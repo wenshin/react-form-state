@@ -1,3 +1,4 @@
+import 'babel-polyfill';
 import React from 'react';
 import ReactDOM from 'react-dom';
 import {InputField} from 'react-form-state';
@@ -199,16 +200,18 @@ FormState 实例化时会执行一次全量的校验，但是并不会把结果�
 - **validator**，vajs.ValidatorMap 实例
 - **onStateChange** 当执行 updateState 方法后触发该方法执行，参数为 FormState 实例
 
-### FormState.prototype.updateState({name, value})
+
+### FormState.prototype.updateState({name, value, notUpdateResult})
 更新数据和校验，并触发 onStateChange 方法
 
 - **name**，表单初始化数据
 - **value**，vajs.ValidatorMap 实例
+- **notUpdateResult**，Boolean，true 代表只更新 formState.isValid 不更新 formState.results
 
-### FormState.prototype.update({name, value})
+### FormState.prototype.update({name, value, notUpdateResult})
 只是更新数据和校验，适合用于联合更新数据，参数和 \`updateState\` 方法相同
 
-### FormState.prototype.validateOne({name, value})
+### FormState.prototype.validateOne({name, value, notUpdateResult})
 校验指定数据，适合用于数据不更新只是校验，参数同 \`updateState\`。
 如果 value 属性不存在于参数对象时，认为使用当前保存的值进行校验。
 

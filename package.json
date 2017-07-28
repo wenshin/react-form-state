@@ -1,6 +1,6 @@
 {
   "name": "@myfe/react-form-state",
-  "version": "1.1.1",
+  "version": "1.1.2",
   "keywords": [
     "react",
     "form",
@@ -30,6 +30,7 @@
     "babel-loader": "^6.4.1",
     "babel-plugin-transform-class-properties": "^6.23.0",
     "babel-plugin-transform-object-rest-spread": "^6.23.0",
+    "babel-plugin-transform-proto-to-assign": "^6.23.0",
     "babel-preset-env": "^1.2.2",
     "babel-preset-react": "^6.23.0",
     "css-loader": "^0.27.3",
@@ -53,6 +54,6 @@
     "classnames": "^2.2.5",
     "lodash": "^4.17.4",
     "marked": "^0.3.6",
-    "vajs": "^1.0.6"
+    "vajs": "1.0.7"
   }
 }

@@ -84,8 +84,8 @@ export default class FormControl extends FormChild {
     }
 
     // 更新 Form 的状态
-    if (value && this.form && this.form.update) {
-      this.form.update({name, value});
+    if (value && this.validator && this.form && this.form.update) {
+      this.form.update({name, value, notUpdateResult: true});
     }
 
     this._value = value;
@@ -129,15 +129,18 @@ export default class FormControl extends FormChild {
   render() {
     const {className, name, children} = this.props;
     const inputAttrs = {name, ref: '_input', type: 'text'};
-    let customChildren = this.renderFormControl();
+    let customChildren = children;
 
-    if (!customChildren && children) {
+    if (this.constructor === FormControl && children) {
       this._isCollectData = true;
-      customChildren = children;
     }
 
     // 依赖 this._isCollectData 所以不能放在最前面
     this.initState();
+
+    if (!children) {
+      customChildren = this.renderFormControl();
+    }
 
     const formControlAttrs = {
       className: 'form-control ' + (className || '')

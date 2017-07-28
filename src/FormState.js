@@ -108,17 +108,17 @@ class FormState {
    * 需要更新的字段值
    * @param  {vajs.Result|vajs.MapReuslt}
    */
-  update({name, value}) {
+  update({name, value, notUpdateResult}) {
     if (!(value && typeof value === 'object') && value === this.data[name]) return null;
     this.data[name] = value;
     this.nameChanged = name;
-    return this.validateOne({name, value});
+    return this.validateOne({name, value, notUpdateResult});
   }
 
   // 可用于联合校验
   // this.validateOne(name) 可以根据现有数据进行校验
   validateOne(options) {
-    const {name} = options;
+    const {name, notUpdateResult} = options;
     let {value} = options;
     // 如果没有提供 value 属性，则认为校验当前保存的值
     if (!('value' in options)) {
@@ -131,23 +131,25 @@ class FormState {
       if (result.promise) {
         result.promise = result
           .promise
-          .then(res => this._updateResult(name, res))
+          .then(res => this._updateResult(name, res, notUpdateResult))
           .catch(err => this._onUnhandledRejection(err, name, result.value));
       }
     } else if (value instanceof FormState || isResult(value)) {
       result = value;
     }
-    return this._updateResult(name, result);
+    return this._updateResult(name, result, notUpdateResult);
   }
 
-  _updateResult(name, result) {
+  _updateResult(name, result, notUpdateResult) {
     result.isValid
       ? this._invalidSet.delete(name)
       : this._invalidSet.add(name);
 
-    // 数据更新后，记录校验成功的数据
-    // 这样交互体验更好
-    this.results[name] = result;
+    if (!notUpdateResult) {
+      // 数据更新后，记录校验成功的数据
+      // 这样交互体验更好
+      this.results[name] = result;
+    }
     return result;
   }
 

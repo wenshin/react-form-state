@@ -1,13 +1,15 @@
 {
   "presets": [
     ["env", {
+      "loose": true,
       "targets": {
-        "browsers": ["last 2 versions", "safari >= 7"]
+        "browsers": ["last 4 versions", "ie >= 9"]
       }
     }],
     "react"
   ],
   "plugins": [
+    "transform-proto-to-assign",
     "transform-class-properties",
     "transform-object-rest-spread"
   ]

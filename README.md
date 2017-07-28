@@ -20,6 +20,9 @@ Not Spport React Native.
 
 ## Releases
 
+**1.1.2**
+> support ie9+ http://babeljs.io/docs/usage/caveats/
+
 **1.1.1**
 > refactor Form and FormControl
 

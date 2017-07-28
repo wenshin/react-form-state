@@ -43,8 +43,19 @@ export default class Form extends Component {
 
   onInput = (e) => {
     // contenteditable element will not trigger onChange event
-    if (e.target.contentEditable === 'true') {
-      this.onChange(e);
+    // IE10、11 也不会触发 input 事件
+    if (navigator.userAgent.indexOf('MSIE') === -1) {
+      if (e.target.contentEditable === 'true') {
+        this.onChange(e);
+      }
+    }
+  }
+
+  onKeyUp = (e) => {
+    if (navigator.userAgent.indexOf('MSIE') > -1) {
+      if (e.target.contentEditable === 'true') {
+        this.onChange(e);
+      }
     }
   }
 
@@ -54,6 +65,7 @@ export default class Form extends Component {
       <div
         onChange={this.onChange}
         onInput={this.onInput}
+        onKeyUp={this.onKeyUp}
         className={`form-state ${className || ''}`}
       >
         {children}

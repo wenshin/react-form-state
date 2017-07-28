@@ -641,6 +641,13 @@ babel-plugin-transform-object-rest-spread@^6.23.0:
     babel-plugin-syntax-object-rest-spread "^6.8.0"
     babel-runtime "^6.22.0"
 
+babel-plugin-transform-proto-to-assign@^6.23.0:
+  version "6.23.0"
+  resolved "http://registry.npm.taobao.org/babel-plugin-transform-proto-to-assign/download/babel-plugin-transform-proto-to-assign-6.23.0.tgz#1c24951598793fc6a1d18118a11de1c36376fe2e"
+  dependencies:
+    babel-runtime "^6.22.0"
+    lodash "^4.2.0"
+
 babel-plugin-transform-react-display-name@^6.23.0:
   version "6.23.0"
   resolved "https://registry.yarnpkg.com/babel-plugin-transform-react-display-name/-/babel-plugin-transform-react-display-name-6.23.0.tgz#4398910c358441dc4cef18787264d0412ed36b37"
@@ -4403,9 +4410,9 @@ v8flags@^2.0.10:
   dependencies:
     user-home "^1.1.1"
 
-vajs@^1.0.4:
-  version "1.0.4"
-  resolved "http://registry.npm.taobao.org/vajs/download/vajs-1.0.4.tgz#cc5089d3b9a60589726894580c7b849f09372509"
+vajs@1.0.7:
+  version "1.0.7"
+  resolved "http://registry.npm.taobao.org/vajs/download/vajs-1.0.7.tgz#5388ac4d1ca4991ee51d9608159181839a4f3547"
 
 validate-npm-package-license@^3.0.1:
   version "3.0.1"

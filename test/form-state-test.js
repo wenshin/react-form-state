@@ -156,6 +156,29 @@ describe('FormState', () => {
     assert.ok(formState.results.bar instanceof vajs.Result);
   });
 
+  it('update value with no result update', () => {
+    const formState = new FormState({
+      data: {foo: 1, bar: 2},
+      validator: vajs.map({
+        foo: vajs.number({max: 5}),
+        bar: vajs.number({max: 3})
+      })
+    });
+
+    assert.ok(formState.isValid, 'init is valid');
+    assert.ok(!Object.keys(formState.results).length, 'formState.results is not empty');
+
+    formState.update({name: 'bar', value: 4, notUpdateResult: true});
+
+    assert.ok(!formState.isValid, 'isValid');
+    assert.ok(!formState.results.bar);
+
+    formState.update({name: 'bar', value: 5});
+
+    assert.ok(!formState.isValid, 'isValid');
+    assert.ok(formState.results.bar);
+  });
+
   it('async validation', (done) => {
     let count = 0;
     const formState = new FormState({

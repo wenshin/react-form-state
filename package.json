@@ -45,14 +45,14 @@
     "less-loader": "^4.0.2",
     "mocha": "^3.2.0",
     "prismjs": "^1.6.0",
-    "react": "^15.4.2",
-    "react-dom": "^15.4.2",
+    "react": "15.6.2",
+    "react-dom": "15.6.2",
     "style-loader": "^0.16.0",
     "webpack": "^2.3.1",
     "webpack-dev-server": "^2.4.2"
   },
   "peerDependencies": {
-    "react": "^0.14.0 || ^15.0.0"
+    "react": ">=0.14.0 <=15.6.2"
   },
   "dependencies": {
     "classnames": "^2.2.5",

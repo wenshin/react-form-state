@@ -20,6 +20,11 @@ Not Spport React Native.
 
 ## Releases
 
+**1.2.0**
+> 添加 FormControl 工厂函数
+> 兼容 React 15.x, 16.x
+
+
 **1.1.2**
 > support ie9+ http://babeljs.io/docs/usage/caveats/
 

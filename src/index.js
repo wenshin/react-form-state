@@ -8,6 +8,7 @@ import FormField from './FormField.jsx';
 import FormControl from './FormControl.jsx';
 import FormChild from './FormChild.jsx';
 import FormGroup from './FormGroup.jsx';
+import fc, {createFormControl} from './createFormControlElement.jsx';
 import Input from './components/Input.jsx';
 import InputField from './components/InputField.jsx';
 
@@ -28,4 +29,10 @@ export {
    */
   Input,
   InputField,
+
+  /**
+   * FormControl 工厂函数
+   */
+  fc,
+  createFormControl,
 };

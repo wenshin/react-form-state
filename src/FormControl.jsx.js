@@ -5,8 +5,6 @@ import FormState from './FormState';
 import Form from './Form.jsx';
 import FormChild from './FormChild.jsx';
 
-const {vajs} = FormState;
-
 export default class FormControl extends FormChild {
   static propTypes = {
     name: PropTypes.string,
@@ -43,8 +41,20 @@ export default class FormControl extends FormChild {
     return this.props.value || this.formValue || this._value;
   }
 
+  get isCollectData() {
+    if (!this._isCollectData) {
+      // 直接使用 FormControl 采集数据
+      // <FormControl>
+      //    <input />
+      // </FormControl>
+      this._isCollectData = this.constructor === FormControl && this.props.children;
+      return this._isCollectData;
+    }
+    return this._isCollectData;
+  }
+
   get validator() {
-    if (this._isCollectData
+    if (this.isCollectData
       && this._validator
       && this._validator.size
       && this.props.validator
@@ -62,9 +72,8 @@ export default class FormControl extends FormChild {
     // React 要求 value 和 defaultValue 只能有一个。。。
     if (defaultValue !== undefined) {
       return _omit(this.props, ['value', 'validator']);
-    } else {
-      return _omit(this.props, ['validator', 'defaultValue']);
     }
+    return _omit(this.props, ['validator', 'defaultValue']);
   }
 
   initState() {
@@ -72,7 +81,7 @@ export default class FormControl extends FormChild {
 
     let value;
     const {name} = this.props;
-    if (this._isCollectData) {
+    if (this.isCollectData) {
       this._collectState = new FormState({
         data: (this.value && this.value.data) || {},
         validator: this.validator,
@@ -122,20 +131,17 @@ export default class FormControl extends FormChild {
     });
   };
 
+  /* eslint-disable class-methods-use-this */
   renderFormControl() {
     return null;
   }
+  /* eslint-enable class-methods-use-this */
 
   render() {
     const {className, name, children} = this.props;
-    const inputAttrs = {name, ref: '_input', type: 'text'};
     let customChildren = children;
 
-    if (this.constructor === FormControl && children) {
-      this._isCollectData = true;
-    }
-
-    // 依赖 this._isCollectData 所以不能放在最前面
+    // 依赖 this.isCollectData 所以不能放在最前面
     this.initState();
 
     if (!children) {
@@ -148,13 +154,15 @@ export default class FormControl extends FormChild {
 
     return (
       <div {...formControlAttrs}>
-        {this._isCollectData && customChildren
+        {this.isCollectData && customChildren
           ? (
             <Form
               name={name}
               className='form-control-state'
               state={this._collectState}
-            >{customChildren}</Form>
+            >
+              {customChildren}
+            </Form>
           ) : customChildren}
       </div>
     );

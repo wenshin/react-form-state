@@ -1,9 +1,9 @@
 import {Component} from 'react';
-import Form, {FormState, FormField, FormControl} from 'react-form-state';
+import Form, {createFormControl, FormState, FormField, FormControl} from 'react-form-state';
 import FormFooterField from '../FormFooterField.jsx';
 import Markdown from '../Markdown.jsx';
 
-const vajs = FormState.vajs;
+const {vajs} = FormState;
 
 function MyComponent(props) {
   return (
@@ -24,6 +24,12 @@ class MyFormControl extends FormControl {
     return <MyComponent onChange={this.triggerChange} />;
   }
 }
+
+const MyFormControl1 = createFormControl(MyComponent, {
+  isCollectData: false, // 可选，默认值为 false
+  validator: vajs.number({min: 0.3}), // 可选，默认值 null
+  changeHandlerProp: 'onChange', // 可选，默认值为 'onChange'
+});
 
 class CustomFormControlForm extends Component {
   constructor(props) {
@@ -49,6 +55,9 @@ class CustomFormControlForm extends Component {
           <FormField name='foo' label='我的数据' isExplainInline={false}>
             <MyFormControl name='foo' />
           </FormField>
+          <FormField name='bar' label='By工厂函数' isExplainInline={false}>
+            <MyFormControl1 name='bar' />
+          </FormField>
           <FormFooterField />
         </Form>
       </section>
@@ -61,7 +70,8 @@ export default CustomFormControlForm;
 function createFormState(onStateChange) {
   return new FormState({
     data: {
-      foo: {value: null}
+      foo: null,
+      bar: null
     },
     onStateChange
   });

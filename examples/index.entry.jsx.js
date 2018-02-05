@@ -10,6 +10,7 @@ import CollectForm2 from './form-control/CollectForm2.jsx';
 import CustomCollectForm from './form-control/CustomCollectForm.jsx';
 import FormControlUseWithoutForm from './form-control/FormControlUseWithoutForm.jsx';
 import CustomFormControlForm from './form-control/CustomFormControlForm.jsx';
+import CustomWrappedFormControlForm from './form-control/CustomWrappedFormControlForm.jsx';
 import FormFieldDisabledForm from './form-field/FormFieldDisabledForm.jsx';
 import FormFooterField from './FormFooterField.jsx';
 
@@ -75,18 +76,18 @@ FormControl 上报的结果就是校验结果。因此也就去掉 Util.mergeNes
 
         <section>
           <h3>联合更新和校验</h3>
-          <UnionUpdateForm />
           <section>
             <Code lang='jsx' code={UnionUpdateForm.srcContent} />
           </section>
+          <UnionUpdateForm />
         </section>
 
         <section>
           <h3>服务器端校验</h3>
-          <AsyncValidationForm />
           <section>
             <Code lang='jsx' code={AsyncValidationForm.srcContent} />
           </section>
+          <AsyncValidationForm />
         </section>
 
         <section>
@@ -115,50 +116,59 @@ FormControl 有三种模式：
         `}</Markdown>
           <section>
             <h4>FormControl 收集模式，在顶层 Form 实现校验</h4>
-            <CollectForm2 />
             <section>
               <Code lang='jsx' code={CollectForm2.srcContent} />
             </section>
+            <CollectForm2 />
           </section>
+
           <section>
             <h4>FormControl 收集模式，自带校验功能结果</h4>
-            <Markdown>{`
-
-            `}</Markdown>
-            <CollectForm />
             <section>
               <Code lang='jsx' code={CollectForm.srcContent} />
             </section>
+            <CollectForm />
           </section>
+
           <section>
-            <h4>FormControl 控件模式，继承 FormControl 自定义表单元素</h4>
-            <CustomFormControlForm />
+            <h4>FormControl 控件模式1，继承 FormControl 自定义表单元素</h4>
             <section>
               <Code lang='jsx' code={CustomFormControlForm.srcContent} />
             </section>
+            <CustomFormControlForm />
           </section>
+
+          <section>
+            <h4>FormControl 控件模式2，使用 fc 方法避免创建新的 FormControl 类文件</h4>
+            <section>
+              <Code lang='jsx' code={CustomWrappedFormControlForm.srcContent} />
+            </section>
+            <CustomWrappedFormControlForm />
+          </section>
+
           <section>
             <h4>FormControl 收集控件模式，继承 FormControl 封装采集数据</h4>
-            <CustomCollectForm />
             <section>
               <Code lang='jsx' code={CustomCollectForm.srcContent} />
             </section>
+            <CustomCollectForm />
           </section>
+
           <section>
             <h4>FormControl 控件模式，不在 Form 中使用 FormControl</h4>
-            <FormControlUseWithoutForm />
             <section>
               <Code lang='jsx' code={FormControlUseWithoutForm.srcContent} />
             </section>
+            <FormControlUseWithoutForm />
           </section>
         </section>
 
         <section>
           <h4>继承 FormField</h4>
-          <p>可以通过继承 FormField 并重写 renderLabel, renderField, renderExplain 三个方法自定义 FormField</p>
           <section>
             <Code lang='jsx' code={InputField.srcContent} />
           </section>
+          <p>可以通过继承 FormField 并重写 renderLabel, renderField, renderExplain 三个方法自定义 FormField</p>
         </section>
         <section>
           <h4>FormFooterField</h4>
@@ -166,10 +176,10 @@ FormControl 有三种模式：
         </section>
         <section>
           <h4>禁用 FormField</h4>
-          <FormFieldDisabledForm />
           <section>
             <Code lang='jsx' code={FormFieldDisabledForm.srcContent} />
           </section>
+          <FormFieldDisabledForm />
         </section>
       </section>
       <section>
@@ -251,6 +261,24 @@ FormControl，FormField，ExplainBase 等组件均是 FormChild 的子类。
 FormControl 有两种模式，一种是搜集数据模式，一种是自定义表单控件模式。详细见 FormControl 的相关实例
 从 0.2.0 开始， FormControl 组件不再支持 validator, required 属性
 
+## fc 和 createFormControlElement
+fc 是 createFormControlElement 的快捷方式。它可以实现已有组件转换为 FormControl 组件且创建一个实例。
+接口同 React.createElement
+
+## createFormControl
+已有组件转换为 FormControl 组件的工厂函数
+        `}</Markdown>
+        <pre>{`
+function createFormControl(
+  ReactComponent: React.Component,
+  config?: {
+    validator ?: vajs.Validator,
+    isCollectData?: boolean,
+    chagneHandlerProp?: string
+  }
+)
+        `}</pre>
+        <Markdown>{`
 
 ## FormField、InputField
 详细见实例

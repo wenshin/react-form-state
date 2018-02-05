@@ -1,5 +1,5 @@
 import _omit from 'lodash/omit';
-import {PropTypes} from 'react';
+import PropTypes from 'prop-types';
 import FormState from './FormState';
 
 import Form from './Form.jsx';

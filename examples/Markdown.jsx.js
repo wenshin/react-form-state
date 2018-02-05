@@ -1,7 +1,8 @@
 import marked from 'marked';
 import prism from 'prismjs';
 import 'prismjs/components/prism-jsx';
-import {Component, PropTypes} from 'react';
+import {Component} from 'react';
+import PropTypes from 'prop-types';
 
 const renderer = new marked.Renderer();
 

@@ -1,5 +1,6 @@
 import _omit from 'lodash/omit';
-import React, {PropTypes, Children, cloneElement} from 'react';
+import React, {Children, cloneElement} from 'react';
+import PropTypes from 'prop-types';
 import ExplainText from './ExplainText.jsx';
 import FormChild from './FormChild.jsx';
 

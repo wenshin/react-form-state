@@ -20,6 +20,9 @@ Not Spport React Native.
 
 ## Releases
 
+**1.2.1**
+> 修复 React Not defined 问题
+
 **1.2.0**
 > 添加 FormControl 工厂函数
 > 兼容 React 15.x, 16.x

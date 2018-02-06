@@ -1,3 +1,4 @@
+import React from 'react';
 import FormControl from './FormControl.jsx';
 
 function createFormControl(ReactComponent, config) {

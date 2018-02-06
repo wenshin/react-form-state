@@ -1,3 +1,4 @@
+import React from 'react';
 import FormChild from './FormChild.jsx';
 
 export default class FormGroup extends FormChild {

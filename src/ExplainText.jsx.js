@@ -1,3 +1,4 @@
+import React from 'react';
 import ExplainBase from './ExplainBase.jsx';
 
 export default class ExplainText extends ExplainBase {

@@ -20,6 +20,9 @@ Not Spport React Native.
 
 ## Releases
 
+**2.0.0**
+> value 和 result 分离开。修改 FormState.data 的值和 vajs 自定义校验的入参`vajs.v((value, {state, subResult}) => {})`
+
 **1.2.1**
 > 修复 React Not defined 问题
 

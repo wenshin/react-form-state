@@ -1,9 +1,8 @@
 import {Component} from 'react';
-import Form, {FormState, FormField, FormControl} from 'react-form-state';
-import FormFooterField from '../FormFooterField.jsx';
+import {FormState, FormControl} from 'react-form-state';
 import Markdown from '../Markdown.jsx';
 
-const vajs = FormState.vajs;
+const {vajs} = FormState;
 
 class MyFormControl extends FormControl {
   _validator = vajs.number({min: 0.3});

@@ -1,9 +1,9 @@
 import {Component} from 'react';
-import Form, {Util, FormState, FormField, FormControl, ExplainText} from 'react-form-state';
+import Form, {FormState, FormField, FormControl, ExplainText} from 'react-form-state';
 import FormFooterField from '../FormFooterField.jsx';
 import Markdown from '../Markdown.jsx';
 
-const vajs = FormState.vajs;
+const {vajs} = FormState;
 
 // 自动合并 vajs.map() 返回 validator
 const customValidator = vajs.map({
@@ -24,7 +24,9 @@ class MyFormControl extends FormControl {
   // }
 
   renderFormControl() {
-    const {data, results} = this.value;
+    const {name} = this.props;
+    const data = this.value;
+    const results = this.form.getResultsOf(name);
     return (
       <div>
         <div>
@@ -76,19 +78,19 @@ export default CustomCollectForm;
 function createFormState(onStateChange) {
   return new FormState({
     data: {
-      collected: {data: {}, results: {}}
+      collected: {}
     },
     validator: vajs.map({
-      collected: vajs.v((val) => {
-        const {data, isValid} = val;
-        let result = new vajs.Result({value: data});
-        const isEmpty = !data.foo1 || !data.foo2 || !data.foo3;
+      collected: vajs.v((value, extra) => {
+        const {subResult} = extra;
+        const result = new vajs.Result({value});
+        const isEmpty = !value.foo1 || !value.foo2 || !value.foo3;
         if (isEmpty) {
           result.isValid = false;
           result.message = '所有字段不能为空';
         } else {
-          result.isValid = isValid;
-          result.message = isValid ? 'Bravo！' : '校验失败！';
+          result.isValid = subResult.isValid;
+          result.message = subResult.isValid ? 'Bravo！' : '校验失败！';
         }
         return result;
       })

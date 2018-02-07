@@ -17,6 +17,12 @@ function MyComponent(props) {
   );
 }
 
+function MyComponent1(props) {
+  return (
+    <div><input {...props} /><span>输入：{props.value}</span></div>
+  );
+}
+
 class MyFormControl extends FormControl {
   _validator = vajs.number({min: 0.3});
 
@@ -25,9 +31,9 @@ class MyFormControl extends FormControl {
   }
 }
 
-const MyFormControl1 = createFormControl(MyComponent, {
+const MyFormControl1 = createFormControl(MyComponent1, {
   isCollectData: false, // 可选，默认值为 false
-  validator: vajs.number({min: 0.3}), // 可选，默认值 null
+  validator: vajs.number({min: 10}), // 可选，默认值 null
   changeHandlerProp: 'onChange', // 可选，默认值为 'onChange'
 });
 
@@ -55,9 +61,10 @@ class CustomFormControlForm extends Component {
           <FormField name='foo' label='我的数据' isExplainInline={false}>
             <MyFormControl name='foo' />
           </FormField>
-          <FormField name='bar' label='By工厂函数' isExplainInline={false}>
+          <div>
+            <span>没有FormField</span>
             <MyFormControl1 name='bar' />
-          </FormField>
+          </div>
           <FormFooterField />
         </Form>
       </section>
@@ -71,7 +78,7 @@ function createFormState(onStateChange) {
   return new FormState({
     data: {
       foo: null,
-      bar: null
+      bar: ''
     },
     onStateChange
   });

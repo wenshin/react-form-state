@@ -6,7 +6,7 @@ import Markdown, {Code} from './Markdown.jsx';
 import UnionUpdateForm from './normal/UnionUpdateForm.jsx';
 import AsyncValidationForm from './normal/AsyncValidationForm.jsx';
 import CollectForm from './form-control/CollectForm.jsx';
-import CollectForm2 from './form-control/CollectForm2.jsx';
+import CollectFormTopValidation from './form-control/CollectFormTopValidation.jsx';
 import CustomCollectForm from './form-control/CustomCollectForm.jsx';
 import FormControlUseWithoutForm from './form-control/FormControlUseWithoutForm.jsx';
 import CustomFormControlForm from './form-control/CustomFormControlForm.jsx';
@@ -41,13 +41,12 @@ function App() {
 这往往发生在内网和外网同时提供服务，PC 端和移动端同时提供服务，
 我们期望表单的数据处理逻辑可以直接被复用。
 
-### 1.0 核心逻辑简优化
-
-从 1.0.0 开始，恢复 FormControl 支持 validator 自校验，
-但是和以前 0.1.x 和 0.2.3 版本不同，不再需要处理令人厌烦的嵌套校验结果了，
-FormControl 上报的结果就是校验结果。因此也就去掉 Util.mergeNestedResult 和 Util.getNestedResult 方法。
-虽然这一切都很美好，也引入了一点小小的问题，在初始化 FormState 并设置 data 属性时，
-你需要设置属性值为 \`{value: null}\` 或者 \`{data: {}}\`，这点需要特别注意！
+### 2.0 主要变化
+2.0 版本完全区分了 value 和校验结果 result，不会像 1.x 那样把 value 和校验结果混合在一起了。
+因此相对于 1.x 的接口，出现了一些不兼容的变化。
+1. FormState.data 现在不再包含校验结果，而所有的校验结果都只能从 FormState.results 中获取
+2. 1.x 的版本中 \`vajs.v((value, state) => {})\` 自定义校验的第二个参数是当前的 FormState 实例，
+  而在 2.x 中 第二个参数是一个\`{state, subResult}\`这样的对象。
 
 ### 样式最简
 现实中，很多业务没有办法直接使用固定的样式，如果组件提供复杂的样式实现，将很大概率导致样式冲突。
@@ -117,9 +116,9 @@ FormControl 有三种模式：
           <section>
             <h4>FormControl 收集模式，在顶层 Form 实现校验</h4>
             <section>
-              <Code lang='jsx' code={CollectForm2.srcContent} />
+              <Code lang='jsx' code={CollectFormTopValidation.srcContent} />
             </section>
-            <CollectForm2 />
+            <CollectFormTopValidation />
           </section>
 
           <section>

@@ -119,7 +119,8 @@ function createFormState(onStateChange) {
       desc: '123'
     },
     validator: vajs.map({
-      name: vajs.v((val, state) => {
+      name: vajs.v((val, extra) => {
+        const {state} = extra;
         let result = nameValidator.validate(val);
         if (result.isValid && state.data.fathername === val) {
           result = new vajs.Result({isValid: false, message: '不能和父亲名字一样'});
@@ -127,7 +128,8 @@ function createFormState(onStateChange) {
         return result;
       }),
       nickname: vajs.string({maxLength: 3}),
-      fathername: vajs.v((val, state) => {
+      fathername: vajs.v((val, extra) => {
+        const {state} = extra;
         let result = nameValidator.validate(val);
         if (result.isValid && state.data.name === val) {
           result = new vajs.Result({isValid: false, message: '不能和子女名字一样'});
@@ -138,7 +140,6 @@ function createFormState(onStateChange) {
     onStateChange(state) {
       // contentEditable 元素变更不能刷新，否则会丢失 Cursor
       if (state.nameChanged === 'desc') {
-        console.log('update editable data', state.data.desc);
         return;
       }
 

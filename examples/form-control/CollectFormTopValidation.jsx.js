@@ -3,13 +3,13 @@ import Form, {Util, FormState, FormField, FormControl, ExplainText} from 'react-
 import FormFooterField from '../FormFooterField.jsx';
 import Markdown from '../Markdown.jsx';
 
-const vajs = FormState.vajs;
+const {vajs} = FormState;
 
 const formCtrlValidator = vajs.map({
   foo1: vajs.number({max: 10})
 });
 
-class CollectForm extends Component {
+class CollectFormTopValidation extends Component {
   constructor(props) {
     super(props);
     this.formState = createFormState(() => {
@@ -18,8 +18,9 @@ class CollectForm extends Component {
   }
 
   render() {
-    const collected = this.formState.data.collected;
-    const collectedResult = this.formState.results.collected || {results: {}};
+    const {data} = this.formState;
+    const collected = data.collected || {};
+    const results = this.formState.getResultsOf('collected');
     return (
       <section>
         <Markdown>{`
@@ -36,7 +37,7 @@ class CollectForm extends Component {
               <div>
                 <label>foo1: <input name='foo1' value={collected.foo1} /></label>
                 <ExplainText
-                  validResult={collectedResult.results.foo1}
+                  validResult={results.foo1}
                   defaultExplain='最大不超过10'
                   inline
                 />
@@ -44,7 +45,7 @@ class CollectForm extends Component {
               <div>
                 <label>foo2: <input name='foo2' value={collected.foo2} /></label>
                 <ExplainText
-                  validResult={collectedResult.results.foo2}
+                  validResult={results.foo2}
                   defaultExplain='可选'
                   inline
                 />
@@ -52,7 +53,7 @@ class CollectForm extends Component {
               <div>
                 <label>foo3: <input name='foo3' value={collected.foo3} /></label>
                 <ExplainText
-                  validResult={collectedResult.results.foo3}
+                  validResult={results.foo3}
                   defaultExplain='可选'
                   inline
                 />
@@ -66,27 +67,26 @@ class CollectForm extends Component {
   }
 }
 
-export default CollectForm;
+export default CollectFormTopValidation;
 
 function createFormState(onStateChange) {
   return new FormState({
     data: {
-      collected: {data: {}, results: {}}
+      collected: {}
     },
     validator: vajs.map({
-      collected: vajs.v((val) => {
-        let result = new vajs.Result();
-        const {data} = val;
-        const result1 = formCtrlValidator.validate(data);
-        result.results = result1.results;
+      collected: vajs.v((value) => {
+        const result = new vajs.Result();
+        const subResult = formCtrlValidator.validate(value);
+        result.results = subResult.results;
 
-        const isEmpty = !data.foo1 || !data.foo2 || !data.foo3;
+        const isEmpty = !value.foo1 || !value.foo2 || !value.foo3;
         if (isEmpty) {
           result.isValid = false;
           result.message = '所有字段不能为空';
         } else {
-          result.isValid = result1.isValid;
-          result.message = result1.isValid ? 'Bravo！' : '校验失败！';
+          result.isValid = subResult.isValid;
+          result.message = subResult.isValid ? 'Bravo！' : '校验失败！';
         }
         return result;
       })

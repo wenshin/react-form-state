@@ -9,7 +9,7 @@ const formCtrlValidator = vajs.map({
   foo1: vajs.number({max: 10})
 });
 
-class CollectForm extends Component {
+class CollectFormTopValidation extends Component {
   constructor(props) {
     super(props);
     this.formState = createFormState(() => {
@@ -18,7 +18,9 @@ class CollectForm extends Component {
   }
 
   render() {
-    const collected = this.formState.data.collected;
+    const {data} = this.formState;
+    const collected = data.collected || {};
+    const results = this.formState.getResultsOf('collected');
     return (
       <section>
         <Markdown>{`
@@ -33,25 +35,25 @@ FormControl 直接使用，可以自动监听子元素的 onChange 事件冒泡�
           <FormField name='collected' label='收集数据' isExplainInline={false}>
             <FormControl validator={formCtrlValidator}>
               <div>
-                <label>foo1: <input name='foo1' value={collected.data.foo1} /></label>
+                <label>foo1: <input name='foo1' value={collected.foo1} /></label>
                 <ExplainText
-                  validResult={collected.results.foo1}
+                  validResult={results.foo1}
                   defaultExplain='最大不超过10'
                   inline
                 />
               </div>
               <div>
-                <label>foo2: <input name='foo2' value={collected.data.foo2} /></label>
+                <label>foo2: <input name='foo2' value={collected.foo2} /></label>
                 <ExplainText
-                  validResult={collected.results.foo2}
+                  validResult={results.foo2}
                   defaultExplain='可选'
                   inline
                 />
               </div>
               <div>
-                <label>foo3: <input name='foo3' value={collected.data.foo3} /></label>
+                <label>foo3: <input name='foo3' value={collected.foo3} /></label>
                 <ExplainText
-                  validResult={collected.results.foo3}
+                  validResult={results.foo3}
                   defaultExplain='可选'
                   inline
                 />
@@ -65,24 +67,24 @@ FormControl 直接使用，可以自动监听子元素的 onChange 事件冒泡�
   }
 }
 
-export default CollectForm;
+export default CollectFormTopValidation;
 
 function createFormState(onStateChange) {
   return new FormState({
     data: {
-      collected: {data: {}, results: {}}
+      collected: {}
     },
     validator: vajs.map({
-      collected: vajs.v((val) => {
-        const {data, isValid} = val;
-        let result = new vajs.Result({value: data});
-        const isEmpty = !data.foo1 || !data.foo2 || !data.foo3;
+      collected: vajs.v((value, extra) => {
+        const {subResult} = extra;
+        const result = new vajs.Result({value});
+        const isEmpty = !value.foo1 || !value.foo2 || !value.foo3;
         if (isEmpty) {
           result.isValid = false;
           result.message = '所有字段不能为空';
         } else {
-          result.isValid = isValid;
-          result.message = isValid ? 'Bravo！' : '校验失败！';
+          result.isValid = subResult.isValid;
+          result.message = subResult.isValid ? 'Bravo！' : '校验失败！';
         }
         return result;
       })

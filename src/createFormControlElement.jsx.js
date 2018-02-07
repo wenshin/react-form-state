@@ -1,6 +1,8 @@
 import React from 'react';
 import FormControl from './FormControl.jsx';
 
+const noop = () => {};
+
 function createFormControl(ReactComponent, config) {
   if (!ReactComponent) throw new Error('React Class is needed');
   if (ReactComponent.FCtrlWrapper) return ReactComponent.FCtrlWrapper;
@@ -13,12 +15,16 @@ function createFormControl(ReactComponent, config) {
     renderFormControl() {
       const onChange = this.props[chagneHandlerProp];
       const overrideProps = {};
+      overrideProps.value = this.value;
       overrideProps[chagneHandlerProp] = this.triggerChange;
       if (onChange) {
         overrideProps[chagneHandlerProp] = (...args) => {
           this.triggerChange(...args);
           onChange(...args);
         };
+      } else {
+        // 避免 React 提示受限组件必须有 onChange 的问题
+        overrideProps[chagneHandlerProp] = noop;
       }
       return <ReactComponent {...this.props} {...overrideProps} />;
     }

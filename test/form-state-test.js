@@ -62,9 +62,10 @@ describe('FormState', () => {
     formState.updateState({name: 'foo', value: 1});
   });
 
-  it('FormState.updateState with value is FormState instance', (done) => {
+  it('FormState.updateState with FormState instance', (done) => {
     const subFormState = new FormState({
       data: {foo: 10, bar: 2},
+      isEdit: true,
       validator: vajs.map({
         foo: vajs.number({max: 5}),
         bar: vajs.number({max: 12})
@@ -75,13 +76,33 @@ describe('FormState', () => {
       data: {foo: null},
       onStateChange(state) {
         assert.ok(!state.isValid);
-        assert.ok(state.data.foo === subFormState);
-        assert.ok(state.results.foo === subFormState);
+        assert.ok(state.data.foo === subFormState.data);
+        assert.ok(state.results.foo.results.foo === subFormState.results.foo);
         done();
       }
     });
 
     formState.updateState({name: 'foo', value: subFormState});
+  });
+
+  it('FormState.update with FormState instance and notUpdateResult', () => {
+    const subFormState = new FormState({
+      data: {foo: 10, bar: 2},
+      isEdit: true,
+      validator: vajs.map({
+        foo: vajs.number({max: 5}),
+        bar: vajs.number({max: 12})
+      })
+    });
+
+    const formState = new FormState({
+      data: {foo: null}
+    });
+
+    formState.update({name: 'foo', value: subFormState, notUpdateResult: true});
+    assert.ok(!formState.isValid);
+    assert.ok(formState.data.foo === subFormState.data);
+    assert.ok(formState.results.foo !== subFormState);
   });
 
   it('FormState.updateState with value is vajs.Result', (done) => {
@@ -107,20 +128,20 @@ describe('FormState', () => {
         });
         if (states.length === 4) {
           assert.ok(!states[0].isValid);
-          assert.ok(states[0].data.foo === subResultInvalid);
-          assert.ok(states[0].results.foo === subResultInvalid);
+          assert.equal(states[0].data.foo, subResultInvalid.value);
+          assert.deepEqual(states[0].results.foo, subResultInvalid);
 
           assert.ok(states[1].isValid);
-          assert.ok(states[1].data.foo === subResultValid);
-          assert.ok(states[1].results.foo === subResultValid);
+          assert.equal(states[1].data.foo, subResultValid.value);
+          assert.deepEqual(states[1].results.foo, subResultValid);
 
           assert.ok(!states[2].isValid);
-          assert.ok(states[2].data.foo === subMapResultInvalid);
-          assert.ok(states[2].results.foo === subMapResultInvalid);
+          assert.deepEqual(states[2].data.foo, subMapResultInvalid.value);
+          assert.deepEqual(states[2].results.foo.results, subMapResultInvalid.results);
 
           assert.ok(states[3].isValid);
-          assert.ok(states[3].data.foo === subMapResultValid);
-          assert.ok(states[3].results.foo === subMapResultValid);
+          assert.deepEqual(states[3].data.foo, subMapResultValid.value);
+          assert.deepEqual(states[3].results.foo.results, subMapResultValid.results);
 
           done();
         }

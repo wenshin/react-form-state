@@ -32,14 +32,12 @@ export default class FormControl extends FormChild {
     super(props);
     this._collectState = null;
     this._isCollectData = false;
-    // 缓存首次校验的 value 值
-    this._value = null;
     this._validator = null;
     this._initialized = false;
   }
 
   get value() {
-    return this.props.value || this.formValue || this._value;
+    return this.props.value || this.formValue;
   }
 
   get isCollectData() {
@@ -80,25 +78,29 @@ export default class FormControl extends FormChild {
   initState() {
     if (this._initialized) return;
 
-    let value;
+    let result;
     const {name} = this.props;
     if (this.isCollectData) {
       this._collectState = new FormState({
-        data: (this.value && this.value.data) || {},
+        data: this.value || {},
         validator: this.validator,
         onStateChange: this.onStateChange
       });
-      value = this._collectState;
+      result = this._collectState;
     } else if (this.validator) {
-      value = this.validator.validate(this.value);
+      result = this.validator.validate(this.value);
     }
 
     // 更新 Form 的状态
-    if (value && this.validator && this.form && this.form.update) {
-      this.form.update({name, value, notUpdateResult: true});
+    if (result && this.validator && this.form && this.form.update) {
+      this.form.update({
+        name,
+        result,
+        value: this.value,
+        notUpdateResult: true
+      });
     }
 
-    this._value = value;
     this._initialized = true;
   }
 
@@ -113,21 +115,22 @@ export default class FormControl extends FormChild {
    * @param  {DomEventLike} srcEvent     原始对象
    * @return {undefined}
    */
-  triggerChange = (valueArg, srcEvent) => {
+  triggerChange = (value, srcEvent) => {
     srcEvent && srcEvent.stopPropagation && srcEvent.stopPropagation();
 
-    let value = valueArg;
+    let result;
     if (!this._isCollectData && this.validator) {
-      value = this.validator.validate(valueArg);
+      result = this.validator.validate(value);
     }
 
     if (this.props.onChange) {
-      this.props.onChange(value);
+      this.props.onChange(value, result);
       return;
     }
 
     this.form.updateState({
       value,
+      result,
       name: this.props.name,
     });
   };

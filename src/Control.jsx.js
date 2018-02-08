@@ -135,9 +135,10 @@ export default class Control extends FormChild {
         throw new Error(`do not use ${onChangeKey} for children of Control. you can deal with change logic in FormState`);
       }
 
+      const value = formatValue ? formatValue(this.value) : this.value;
       const props = {
         name,
-        [valueKey]: formatValue ? formatValue(this.value) : this.value,
+        [valueKey]: value || '', // input 标签只有设置空字符串才能使得 React 不提示不受限组件变为受限组件
         [onChangeKey]: this.triggerChange,
       };
 

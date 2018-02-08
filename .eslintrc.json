@@ -51,11 +51,13 @@
     "react/react-in-jsx-scope": "off",
     // allow have multi component in a file
     "react/no-multi-comp": "off",
+    "react/forbid-prop-types": "off",
     // only warn when use () => {return 'a';}
     "arrow-body-style": "warn",
     "no-underscore-dangle": ["warn", { "allowAfterThis": true }],
     "react/sort-comp": "off",
     "react/jsx-filename-extension": "off",
-    "new-cap": "warn"
+    "new-cap": "warn",
+    "class-methods-use-this": "off"
   }
 }

@@ -1,9 +1,7 @@
 import Input from './Input.jsx';
-import FormField from '../FormField.jsx';
+import Field from '../Field.jsx';
 
-function noop() {}
-
-export default class InputField extends FormField {
+export default class InputField extends Field {
   renderField() {
     const props = this.pickProps();
     props.children = undefined;

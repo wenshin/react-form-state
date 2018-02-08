@@ -19,10 +19,6 @@
         height: @formElementHeight;
     }
 
-    .form__group {
-        margin-bottom: 40px;
-    }
-
     .form-control {
         display: inline-block;
     }
@@ -60,42 +56,43 @@
             color: @textColorError;
         }
 
-        .explanation {
-            margin-left: @formFieldInlineGap;
+    }
+
+    .explanation {
+        margin-left: @formFieldInlineGap;
+    }
+
+    .explanation--next-line {
+        margin-left: 0;
+        margin-bottom: 5px;
+        display: block;
+    }
+
+    .form-explain {
+        &.form-explain--inline {
+            display: inline-block;
+            margin-left: 10px;
         }
 
-        .explanation--next-line {
-            margin-left: 0;
-            margin-bottom: 5px;
-            display: block;
+        &.form-explain--info {
+            color: @textColorInfo;
         }
 
-        .form-explain {
-            &.form-explain--inline {
-                display: inline-block;
-                margin-left: 10px;
-            }
-
-            &.form-explain--info {
-                color: @textColorInfo;
-            }
-
-            &.form-explain--error {
-                color: @textColorError;
-            }
-
-            &.form-explain--warn {
-                color: @textColorWarn;
-            }
-
-            &.form-explain--success {
-                color: @textColorSucc;
-            }
+        &.form-explain--error {
+            color: @textColorError;
         }
 
-        .form-explain__text {
-            line-height: @formElementHeight;
+        &.form-explain--warn {
+            color: @textColorWarn;
         }
+
+        &.form-explain--success {
+            color: @textColorSucc;
+        }
+    }
+
+    .form-explain__text {
+        line-height: @formElementHeight;
     }
 
     .form__static-text {

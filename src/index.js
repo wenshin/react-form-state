@@ -4,11 +4,10 @@ import FormState from './FormState';
 import Form from './Form.jsx';
 import ExplainBase from './ExplainBase.jsx';
 import ExplainText from './ExplainText.jsx';
-import FormField from './FormField.jsx';
-import FormControl from './FormControl.jsx';
+import Field from './Field.jsx';
+import Control from './Control.jsx';
+import ControlCollector from './ControlCollector.jsx';
 import FormChild from './FormChild.jsx';
-import FormGroup from './FormGroup.jsx';
-import fc, {createFormControl} from './createFormControlElement.jsx';
 import Input from './components/Input.jsx';
 import InputField from './components/InputField.jsx';
 
@@ -16,23 +15,17 @@ export default Form;
 
 export {
   FormState,
+  FormChild,
+  Control,
+  ControlCollector,
 
   Explain,
   ExplainBase,
   ExplainText,
-  FormField,
-  FormControl,
-  FormChild,
-  FormGroup,
+  Field,
   /**
    * 自定义封装的常用组件
    */
   Input,
   InputField,
-
-  /**
-   * FormControl 工厂函数
-   */
-  fc,
-  createFormControl,
 };

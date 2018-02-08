@@ -1,10 +1,8 @@
 import React, {Component} from 'react';
 import PropTypes from 'prop-types';
 import FormState from './FormState';
+import util from './util';
 
-const tagsHaveInputEvent = ['input', 'select', 'textarea'];
-const inputTypesUsingClickEvent = ['checkbox', 'radio'];
-const userAgent = navigator && navigator.userAgent;
 const IS_IE = navigator
   && navigator.userAgent
   // IE11 useragent 不再使用 MSIE 而是使用 Trident 引擎名
@@ -33,7 +31,7 @@ export default class Form extends Component {
   }
 
   onChange = (e) => {
-    const data = getEventData(e);
+    const data = util.getEventData(e);
     // 只有当存在 name 字段时才捕捉
     if (data.name) {
       // 不用在意，目前已经不适用 React 的事件流
@@ -67,6 +65,7 @@ export default class Form extends Component {
 
   render() {
     const {children, className} = this.props;
+    /* eslint-disable jsx-a11y/no-static-element-interactions */
     return (
       <div
         onChange={this.onChange}
@@ -77,24 +76,6 @@ export default class Form extends Component {
         {children}
       </div>
     );
+    /* eslint-enable jsx-a11y/no-static-element-interactions */
   }
-}
-
-
-function getEventData(e) {
-  const {
-    type, checked,
-    isFormControl, formControlValue,
-    contentEditable
-  } = e.target;
-  let {name, value} = e.target;
-
-  name = name || e.target.getAttribute('name');
-  value = type === 'checkbox' ? checked : value;
-  value = isFormControl ? formControlValue : value;
-
-  if (contentEditable === 'true') {
-    value = e.target.innerHTML;
-  }
-  return {name, value};
 }

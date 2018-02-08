@@ -6,7 +6,7 @@ import FormChild from './FormChild.jsx';
 
 const noop = () => {};
 
-export default class FormField extends FormChild {
+export default class Field extends FormChild {
   static propTypes = {
     label: PropTypes.oneOfType([PropTypes.string, PropTypes.element]),
     labelTip: PropTypes.string,
@@ -54,7 +54,7 @@ export default class FormField extends FormChild {
   static ExplainClass = ExplainText;
 
   static setExplainClass(ExplainClass) {
-    FormField.ExplainClass = ExplainClass;
+    Field.ExplainClass = ExplainClass;
   }
 
   pickProps(props) {
@@ -92,7 +92,7 @@ export default class FormField extends FormChild {
     } = this.props;
 
     return isExplainShow ? (
-      <FormField.ExplainClass
+      <Field.ExplainClass
         name={name}
         inline={isExplainInline}
         validResult={validResult || this.formResult}
@@ -109,18 +109,10 @@ export default class FormField extends FormChild {
     // 默认如果只有一个子元素，自动会给子元素新增 value 属性
     // 注意 input，textarea 等内置元素，动态添加 props，React 15 加了一些警告提示
     if (Children.count(children) === 1 && typeof children === 'object') {
-      const props = this.formValue === undefined ? {} : {value: this.formValue};
-      // React 会提示如果设置了 value 却不设置 onChange 会强制设置为 ReadOnly
-      const needOnChangeType = ['input', 'select', 'textarea'];
-      if (needOnChangeType.indexOf(children.type) > -1) {
-        props.onChange = children.props.onChange || noop;
-      }
-      props.required = children.props.required || required;
-      if (name) props.name = name;
-
-      if (Object.keys(props).length) {
-        newChildren = cloneElement(children, props);
-      }
+      newChildren = cloneElement(children, {
+        name,
+        required: children.props.required || required,
+      });
     }
     return newChildren;
   }

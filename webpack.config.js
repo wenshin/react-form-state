@@ -101,6 +101,11 @@ const webpackConfig = {
         }, {
           loader: 'css-loader' // translates CSS into CommonJS
         }]
+      }, {
+        test: /\.jpg$/,
+        use: [{
+          loader: 'url-loader'
+        }]
       }
     ]
   },

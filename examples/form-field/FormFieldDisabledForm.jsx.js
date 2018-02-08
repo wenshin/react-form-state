@@ -1,7 +1,9 @@
 import {Component} from 'react';
-import Form, {FormState, FormField, FormControl, ExplainText} from 'react-form-state';
+import Form, {FormState, Field, ControlCollector, ExplainText} from 'react-form-state';
 import FormFooterField from '../FormFooterField.jsx';
 import Markdown from '../Markdown.jsx';
+
+const {vajs} = FormState;
 
 class FormFieldDisabledForm extends Component {
   constructor(props) {
@@ -16,18 +18,18 @@ class FormFieldDisabledForm extends Component {
     return (
       <section>
         <Markdown>{`
-FormControl 直接使用，可以自动监听子元素的 onChange 事件冒泡，
-并把数据合并为一个对象。同时 FormControl 允许自定义 validator，
+Control 直接使用，可以自动监听子元素的 onChange 事件冒泡，
+并把数据合并为一个对象。同时 Control 允许自定义 validator，
 这可以有效的重用校验逻辑。
 
 下例中 Form 本身提供校验“必须 foo1、foo2、foo3 有值”，
-且 FormControl 自身也提供校验“foo1 值必须小于10，foo2、foo3 是可选的”。
+且 Control 自身也提供校验“foo1 值必须小于10，foo2、foo3 是可选的”。
         `}</Markdown>
         <Form
           state={this.formState}
         >
-          <FormField disabled name='collected' label='收集数据' isExplainInline={false}>
-            <FormControl>
+          <Field disabled name='collected' label='收集数据' isExplainInline={false}>
+            <ControlCollector>
               <div>
                 <label>foo1: <input name='foo1' /></label>
                 <ExplainText
@@ -49,8 +51,8 @@ FormControl 直接使用，可以自动监听子元素的 onChange 事件冒泡�
                   inline
                 />
               </div>
-            </FormControl>
-          </FormField>
+            </ControlCollector>
+          </Field>
           <FormFooterField />
         </Form>
       </section>

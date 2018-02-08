@@ -1,17 +1,17 @@
 import {Component} from 'react';
-import {FormState, FormControl} from 'react-form-state';
+import Form, {FormState, Control} from 'react-form-state';
 import Markdown from '../Markdown.jsx';
 
 const {vajs} = FormState;
 
-class MyFormControl extends FormControl {
+class MyFormControl extends Control {
   _validator = vajs.number({min: 0.3});
 
   onClick = () => {
     this.triggerChange(Math.random());
   }
 
-  renderFormControl() {
+  renderControl() {
     return (
       <button
         onClick={this.onClick}
@@ -22,7 +22,7 @@ class MyFormControl extends FormControl {
   }
 }
 
-class FormControlUseWithoutForm extends Component {
+class ControlUseWithoutForm extends Component {
   constructor(props) {
     super(props);
     this.state = {
@@ -44,11 +44,11 @@ class FormControlUseWithoutForm extends Component {
         <div>
           <MyFormControl value={this.state.foo} onChange={this.onChange} />
           <pre>{JSON.stringify(this.state.foo, null, 2)}</pre>
-          <br/>
+          <br />
         </div>
       </section>
     );
   }
 }
 
-export default FormControlUseWithoutForm;
+export default ControlUseWithoutForm;

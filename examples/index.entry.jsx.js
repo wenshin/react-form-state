@@ -5,14 +5,13 @@ import {InputField} from 'react-form-state';
 import Markdown, {Code} from './Markdown.jsx';
 import UnionUpdateForm from './normal/UnionUpdateForm.jsx';
 import AsyncValidationForm from './normal/AsyncValidationForm.jsx';
+import CustomControl from './form-control/CustomControl.jsx';
 import CollectForm from './form-control/CollectForm.jsx';
-import CollectFormTopValidation from './form-control/CollectFormTopValidation.jsx';
-import CustomCollectForm from './form-control/CustomCollectForm.jsx';
-import FormControlUseWithoutForm from './form-control/FormControlUseWithoutForm.jsx';
-import CustomFormControlForm from './form-control/CustomFormControlForm.jsx';
-import CustomWrappedFormControlForm from './form-control/CustomWrappedFormControlForm.jsx';
+import ControlUseWithoutForm from './form-control/ControlUseWithoutForm.jsx';
 import FormFieldDisabledForm from './form-field/FormFieldDisabledForm.jsx';
 import FormFooterField from './FormFooterField.jsx';
+
+import formIntroImg from './imgs/form-intro.jpg';
 
 import './markdown.css';
 import './markdown-theme5.css';
@@ -41,13 +40,6 @@ function App() {
 这往往发生在内网和外网同时提供服务，PC 端和移动端同时提供服务，
 我们期望表单的数据处理逻辑可以直接被复用。
 
-### 2.0 主要变化
-2.0 版本完全区分了 value 和校验结果 result，不会像 1.x 那样把 value 和校验结果混合在一起了。
-因此相对于 1.x 的接口，出现了一些不兼容的变化。
-1. FormState.data 现在不再包含校验结果，而所有的校验结果都只能从 FormState.results 中获取
-2. 1.x 的版本中 \`vajs.v((value, state) => {})\` 自定义校验的第二个参数是当前的 FormState 实例，
-  而在 2.x 中 第二个参数是一个\`{state, subResult}\`这样的对象。
-
 ### 样式最简
 现实中，很多业务没有办法直接使用固定的样式，如果组件提供复杂的样式实现，将很大概率导致样式冲突。
 
@@ -57,24 +49,34 @@ function App() {
 ### 不支持的特性
 目前不支持自动收集 contentEditable 的元素，因为在自动刷新 contentEditable 元素时会丢失 Cursor 的焦点。
 因此你需要在 contentEditable 元素编辑完后再去获取编辑好的内容，可参考下面第一个例子。
-        `}</Markdown>
-      </section>
 
-      <section>
-        <h1>使用指南</h1>
-        <section>
-          <Markdown>{`
-### 引入文件
+# 3.0 主要变化
+3.0 开始对 react-form-state 作了大量重构，简化了学习文档，把 FormControl 改为 Control 避免冗余。
+整体上继续精简各种功能，使得核心功能更加简洁优雅。
+以前版本中 FormControl 的采集功能独立出来变成 ControlCollector。
+2.0 中加入的工厂函数也在 Control 独立实现，不在需要在 JSX 中引入函数了
+
+# 概念介绍
+![表单各元素介绍](${formIntroImg})
+1. filed 包含 label、contorl、explain 三个子元素
+2. label 是用于描述 control 的名称，比如：用户名，密码
+3. control 是指在表单中产生数据的元素，比如：input, textarea, select 等。
+4. explain 是指 control 的说明文案或者校验提示结果
+
+# 使用指南
+## 引入文件
 同时引入 js 和 css。
 
 - \`import Form from '@myfe/react-form-state'\`
 - \`<link rel="stylesheet" href="path/to/@myfe/react-form-state/style.css"></link>\`
 - \`import Form from '@myfe/react-form-state/webpack' 当你使用 webpakc，会自动引入 style.css\`
-          `}</Markdown>
-        </section>
+        `}</Markdown>
+      </section>
 
+      <section>
+        <h2>例子</h2>
         <section>
-          <h3>联合更新和校验</h3>
+          <h3>1 联合更新和校验</h3>
           <section>
             <Code lang='jsx' code={UnionUpdateForm.srcContent} />
           </section>
@@ -82,7 +84,7 @@ function App() {
         </section>
 
         <section>
-          <h3>服务器端校验</h3>
+          <h3>2 服务器端校验</h3>
           <section>
             <Code lang='jsx' code={AsyncValidationForm.srcContent} />
           </section>
@@ -91,95 +93,75 @@ function App() {
 
         <section>
           <Markdown>{`
-### FormControl 表单元素
-FormControl 默认接受的属性有 \`name\`, \`value\`, \`defaultValue\`, \`validator\`。
+### 3 自定义 Control 组件
+通过 Control 和 ControlCollector 我们可以实现非常灵活的组件自定义。
+Control 和 ControlCollector 都接受的属性有 \`name\`, \`value\`, \`validator\`。
+如果是在 Form 组件内部使用，name 是必须的属性。如果是嵌套在 Field 内，那么 name 可以省略。
+本节我们先介绍 Control 的使用和自定义
 
-FormControl 有三种模式：
-1. **收集模式**，可以直接嵌套为 FormControl 的子元素，也可以通过集成实现。
-2. **控件模式**，通过继承并在内部调用 \`this.triggerChange()\` 封装为一个可触发 onChange 事件的控件元素。
-3. **收集控件模式**，通过继承并且设置 _isCollectData 为 true，可把数据收集为一个对象。
 
-#### 三种校验设置方法
+Control 有两种使用方式：
+1. **继承方式**，通过继承并在内部调用 \`this.triggerChange()\` 封装为一个控件元素。
+2. **嵌套方式**，通过 Control 的 children 传入已有的控件组件。
+
+第二种方式，在我们的第一个例子中已经有比较详细的介绍，以下的例子主要以继承方式为主。
+
+三种校验设置方法
 1. **Form 校验**。在 Form 的 FormState 实例化时设置；
-2. **FormControl 自带校验**。继承 FormControl 时设置 _validator 属性；
-3. **FormControl 传入校验**。给 FormControl 传入 validator 属性；
+2. **Control 自带校验**。继承 Control 时设置 _validator 属性；
+3. **Control 传入校验**。给 Control 传入 validator 属性；
 
-当 FormControl 自带校验或者传入校验都存在时，会判断是否是**收集模式**。
-如果是，则会合并两个校验；如果不是则优先使用传入的校验。
-
-当 FormControl 自带校验或者传入校验，FormControl 上报 Form 的数据格式会不是存粹的数据。
-如果是**收集模式**，则上报有一个 FromState 的实例，
-如果是**控件模式**，则上传 vajs.Result 或者 vajs.MapResult 实例。
-因此在给 FormState 设置初始值时，
-你需要传入值是 \`{value: null}\` 或者 \`{data: {}}\` 的格式。
+当 Control 自带校验或者传入校验都存在时，会判断两个 validator 是否都是 ValidatorMap 实例，如果是将进行合并。
         `}</Markdown>
           <section>
-            <h4>FormControl 收集模式，在顶层 Form 实现校验</h4>
-            <section>
-              <Code lang='jsx' code={CollectFormTopValidation.srcContent} />
-            </section>
-            <CollectFormTopValidation />
+            <h4>3.1 自定义 Control 组件</h4>
+            <Code lang='jsx' code={CustomControl.srcContent} />
+            <CustomControl />
           </section>
-
           <section>
-            <h4>FormControl 收集模式，自带校验功能结果</h4>
+            <h4>3.2 不在 Form 中使用 Control</h4>
             <section>
-              <Code lang='jsx' code={CollectForm.srcContent} />
+              <Code lang='jsx' code={ControlUseWithoutForm.srcContent} />
             </section>
-            <CollectForm />
-          </section>
-
-          <section>
-            <h4>FormControl 控件模式1，继承 FormControl 自定义表单元素</h4>
-            <section>
-              <Code lang='jsx' code={CustomFormControlForm.srcContent} />
-            </section>
-            <CustomFormControlForm />
-          </section>
-
-          <section>
-            <h4>FormControl 控件模式2，使用 fc 方法避免创建新的 FormControl 类文件</h4>
-            <section>
-              <Code lang='jsx' code={CustomWrappedFormControlForm.srcContent} />
-            </section>
-            <CustomWrappedFormControlForm />
-          </section>
-
-          <section>
-            <h4>FormControl 收集控件模式，继承 FormControl 封装采集数据</h4>
-            <section>
-              <Code lang='jsx' code={CustomCollectForm.srcContent} />
-            </section>
-            <CustomCollectForm />
-          </section>
-
-          <section>
-            <h4>FormControl 控件模式，不在 Form 中使用 FormControl</h4>
-            <section>
-              <Code lang='jsx' code={FormControlUseWithoutForm.srcContent} />
-            </section>
-            <FormControlUseWithoutForm />
+            <ControlUseWithoutForm />
           </section>
         </section>
 
         <section>
-          <h4>继承 FormField</h4>
+          <Markdown>{`
+### 4. ControlCollector 组件
+ControlCollector 其实就是 Form 的二次封装，可以实现搜集子元素到一个对象中的功能
+        `}</Markdown>
           <section>
-            <Code lang='jsx' code={InputField.srcContent} />
+            <Code lang='jsx' code={CollectForm.srcContent} />
           </section>
-          <p>可以通过继承 FormField 并重写 renderLabel, renderField, renderExplain 三个方法自定义 FormField</p>
+          <CollectForm />
         </section>
+
         <section>
-          <h4>FormFooterField</h4>
-          <Code lang='jsx' code={FormFooterField.srcContent} />
-        </section>
-        <section>
-          <h4>禁用 FormField</h4>
+          <h2>其它功能</h2>
           <section>
-            <Code lang='jsx' code={FormFieldDisabledForm.srcContent} />
+            <h4>1 继承 FormField</h4>
+            <section>
+              <Code lang='jsx' code={InputField.srcContent} />
+            </section>
+            <p>可以通过继承 FormField 并重写 renderLabel, renderField, renderExplain 三个方法自定义 FormField</p>
           </section>
-          <FormFieldDisabledForm />
+
+          <section>
+            <h4>2 禁用 FormField</h4>
+            <section>
+              <Code lang='jsx' code={FormFieldDisabledForm.srcContent} />
+            </section>
+            <FormFieldDisabledForm />
+          </section>
+
+          <section>
+            <h4>3 FormFooterField</h4>
+            <Code lang='jsx' code={FormFooterField.srcContent} />
+          </section>
         </section>
+
       </section>
       <section>
         <Markdown>{`
@@ -227,9 +209,6 @@ FormState 实例化时会执行一次全量的校验，但是并不会把结果�
 
 ## Form
 Form 组件是搜集整个表单的数据的根节点。props.state 必须是 FormState 实例。
-DataSet 实现了监听 onChange 事件冒泡的逻辑，调用 props.state.updateState 进行数据更新。
-是用于实现 Form 和 FormControl 搜集数据功能的核心功能。
-
 
 ## FormChild
 FormChild 初始化了 Form 组件的 context 属性，
@@ -251,37 +230,24 @@ FormControl，FormField，ExplainBase 等组件均是 FormChild 的子类。
 ### FormChild.formResult
 实例属性，获取 FormState 实例中 results[name] 值. name 为 formChild 的 props.name 值
 
-### FormChild.formNestedResult
-实例属性，获取 FormState 实例中 results[name].nest 值. name 为 formChild 的 props.name 值。
-当 Form 和 FormControl 同时存在校验时，Form 校验的 result 结果会带上 FormControl 的结果。
+## Control 组件
+继承于 FormChild。Control 是表单元素控件，支持通过继承、嵌套两种方式获取数据并更新到 form 中。
 
+组件属性有：
+  1. name: PropTypes.string,
+  2. onChange: PropTypes.func,
+  3. validator: PropTypes.object,
+  4. value: PropTypes.any,  Control 只支持受限组件
+  5. children: PropTypes.element,
+  6. valueKey: PropTypes.string, 子组件更新数据的属性名，默认是 'value'。例如 checkbox 元素是通过 'checked' 来更新组件数据
+  7. formatValue: PropTypes.func, 子组件数据重新格式化的方法
+  8. onChangeKey: PropTypes.string, 子组件数据变更事件的回调函数名，默认是 'onChange'
 
-## FormControl
-FormControl 有两种模式，一种是搜集数据模式，一种是自定义表单控件模式。详细见 FormControl 的相关实例
-从 0.2.0 开始， FormControl 组件不再支持 validator, required 属性
+## ControlCollector
+继承于 FormChild，封装了子表单。组件属性有：name，validator，className。都是可选值，但是如果不和 Field 一起使用，必须传入 name 属性。
 
-## fc 和 createFormControlElement
-fc 是 createFormControlElement 的快捷方式。它可以实现已有组件转换为 FormControl 组件且创建一个实例。
-接口同 React.createElement
-
-## createFormControl
-已有组件转换为 FormControl 组件的工厂函数
-        `}</Markdown>
-        <pre>{`
-function createFormControl(
-  ReactComponent: React.Component,
-  config?: {
-    validator ?: vajs.Validator,
-    isCollectData?: boolean,
-    chagneHandlerProp?: string
-  }
-)
-        `}</pre>
-        <Markdown>{`
-
-## FormField、InputField
+## Field、InputField
 详细见实例
-
 
 ## ExplainBase、ExplainText 校验结果解释
 详细见实例

@@ -1,16 +1,17 @@
 import {Component} from 'react';
 // 目前只发包了 @myfe/react-form-state，实际使用时，请使用 @myfe/react-form-state
-import Form, {FormField, FormState, Input, InputField} from 'react-form-state';
+import Form, {Field, FormState, Control, Input, InputField} from 'react-form-state';
 import FormFooterField from '../FormFooterField.jsx';
 
-const vajs = FormState.vajs;
+const {vajs} = FormState;
 
 const cities = [{name: '北京', value: 'beijing'}, {name: '广州', value: 'guangzhou'}];
+const noop = () => {};
 
 class UnionUpdateForm extends Component {
   constructor(props) {
     super(props);
-    this.formState = createFormState(() => {
+    this.formState = createFormState((state) => {
       this.forceUpdate();
     });
   }
@@ -31,7 +32,11 @@ class UnionUpdateForm extends Component {
 
     return (
       <section>
-        <p>当表单中的某个字段依赖另外一个字段的时候，我们需要联合更新该字段并进行校验</p>
+        <p>
+          这个例子展示了 react-form-state 如何简洁地实现非常复杂的联合校验场景。
+          在这个例子中，我们可以看到，在 Form 组件中采集数据时，既可以是原生的 input、textarea 等控件，
+          也可以是通过 Control 包裹的组件
+        </p>
         <Form state={this.formState}>
           <InputField
             label='姓名'
@@ -41,63 +46,73 @@ class UnionUpdateForm extends Component {
           />
           <InputField
             type='textarea'
-            label='昵称'
             name='nickname'
+            label='昵称'
             isExplainInline={false}
             defaultExplain='请输入最多3个字符'
             required
           />
-          <InputField
+          <Field
             label='父亲姓名'
             name='fathername'
             isExplainInline={false}
             defaultExplain='请输入最多5个字符，且不能和子女姓名一样'
             required
-          />
-          <InputField
+          >
+            {/*
+              如果 Field 只包裹一个子元素，那么 name 属性可以省略。
+              一旦设置 value 属性，React 就认为是受限组件，会提示必须传入 onChange，
+              即使在 react-form-state 场景下它并不是必要的。
+              警告内容：Failed form propType: You provided a `checked` prop to a form field without an `onChange` handler. This will render a read-only field。
+            */}
+            <input value={data.fathername} onChange={noop} />
+          </Field>
+          <Field
             label='性别'
             name='sex'
-            type='checkbox'
-            isExplainInline={false}
             required
+            defaultExplain='是不是人妖，你说？'
           >
-            人妖：）
-          </InputField>
-          <FormField label='城市'>
-            <select name='city' value={data.city} onChange={() => {}}>
+            <Control><input type='checkbox' /></Control>
+          </Field>
+          <Field name='city' label='城市'>
+            {/*
+              如果没有初始值用于初始化，那么我们可以不设置 value 和 onChange 即非受限组件
+            */}
+            <select>
               {this.renderCityOptions()}
             </select>
-          </FormField>
-          <FormField label='其它'>
+          </Field>
+          <Field label='其它'>
             <label>
-              {/* 使用React 原生支持的 input 标签，
-                  如果有 checked 属性但是没有 onChange 事件，
-                  checkbox 和 radio 会被设置为 read-only。
-                  感觉这个封装好无聊:)*/}
-              <Input
-                type='radio'
+              <Control
                 name='other'
-                value='other1'
-                checked={data.other === 'other1'}
-              />其它1</label>
+                valueKey='checked'
+                formatValue={v => v === 'other1'}
+              >
+                <input type='radio' value='other1' />
+              </Control>
+              其它1
+            </label>
             <label>
-              <Input
+              <input
                 type='radio'
                 name='other'
                 value='other2'
                 checked={data.other === 'other2'}
-              />其它2</label>
-          </FormField>
-          <FormField label='描述'>
+                onChange={noop}
+              />其它2
+            </label>
+          </Field>
+          <Field label='描述'>
             <p>contentEditable 的元素不能实时刷新，会丢失焦点</p>
             <div
               name='desc'
               style={{border: 'solid 1px red'}}
               contentEditable
               dangerouslySetInnerHTML={ {__html: data.desc} }
-            >
-            </div>
-          </FormField>
+            />
+          </Field>
           <FormFooterField />
         </Form>
       </section>
@@ -114,13 +129,12 @@ function createFormState(onStateChange) {
     data: {
       name: 'name',
       nickname: '',
+      fathername: 'foo',
       other: 'other1',
-      city: 'guangzhou',
       desc: '123'
     },
     validator: vajs.map({
-      name: vajs.v((val, extra) => {
-        const {state} = extra;
+      name: vajs.v((val, {state}) => {
         let result = nameValidator.validate(val);
         if (result.isValid && state.data.fathername === val) {
           result = new vajs.Result({isValid: false, message: '不能和父亲名字一样'});
@@ -128,8 +142,7 @@ function createFormState(onStateChange) {
         return result;
       }),
       nickname: vajs.string({maxLength: 3}),
-      fathername: vajs.v((val, extra) => {
-        const {state} = extra;
+      fathername: vajs.v((val, {state}) => {
         let result = nameValidator.validate(val);
         if (result.isValid && state.data.name === val) {
           result = new vajs.Result({isValid: false, message: '不能和子女名字一样'});

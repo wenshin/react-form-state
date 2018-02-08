@@ -1,6 +1,6 @@
-import {FormField} from 'react-form-state';
+import {Field} from 'react-form-state';
 
-export default class FormFooterField extends FormField {
+export default class FormFooterField extends Field {
   renderField() {
     const {data, isValid} = this.form;
     return (

@@ -15,7 +15,6 @@ class AsyncValidationForm extends Component {
   render() {
     return (
       <section>
-        <p>表单中实现异步校验</p>
         <Form state={this.formState}>
           <InputField
             type='text'

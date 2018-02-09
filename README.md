@@ -20,10 +20,13 @@ Not Spport React Native.
 
 ## Releases
 
+**3.1.0**
+> 修复 Control 子元素使用 onChange 报错的问题
+> ExplainText 优化
+
 **3.0.0**
 > 把 FormControl 才分为Control 和 ControlCollector 让使用更加清晰，理解更加简单
 > Control 组件可以减少组件继承二次封装的需要
-
 
 **2.0.0**
 > value 和 result 分离开。修改 FormState.data 的值和 vajs 自定义校验的入参`vajs.v((value, {state, subResult}) => {})`

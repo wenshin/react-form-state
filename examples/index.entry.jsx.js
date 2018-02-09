@@ -84,7 +84,19 @@ function App() {
         </section>
 
         <section>
-          <h3>2 服务器端校验</h3>
+          <h3>2 表单编辑模式</h3>
+          <p>
+            在第一个例子中，我们看到即使表单有初始值，而且校验结果也是失败，但是却没有错误信息提示。这是为什么呢？
+            在长久的表单最佳实践探索中，我们可以看到目前常见的表单在新建时都不会显示校验错误信息，取代的是用户提示信息。
+            但是当我们表单需要加载已有数据后再编辑的时候，我们是否还是按照这种方式呢？
+            在我们的实践中，我们经常会遇到历史数据不符合新校验规则的问题，
+            所以有时候我们希望在编辑模式下直接提示校验错误信息。这就引出了这个小节要介绍的内容。
+            在实例化 FormState 时，设置 isEdit 为 true 后，即可开启初始化时提示校验结果的功能。
+          </p>
+        </section>
+
+        <section>
+          <h3>3 服务器端校验</h3>
           <section>
             <Code lang='jsx' code={AsyncValidationForm.srcContent} />
           </section>
@@ -93,7 +105,7 @@ function App() {
 
         <section>
           <Markdown>{`
-### 3 自定义 Control 组件
+### 4 自定义 Control 组件
 通过 Control 和 ControlCollector 我们可以实现非常灵活的组件自定义。
 Control 和 ControlCollector 都接受的属性有 \`name\`, \`value\`, \`validator\`。
 如果是在 Form 组件内部使用，name 是必须的属性。如果是嵌套在 Field 内，那么 name 可以省略。
@@ -114,12 +126,12 @@ Control 有两种使用方式：
 当 Control 自带校验或者传入校验都存在时，会判断两个 validator 是否都是 ValidatorMap 实例，如果是将进行合并。
         `}</Markdown>
           <section>
-            <h4>3.1 自定义 Control 组件</h4>
+            <h4>4.1 自定义 Control 组件</h4>
             <Code lang='jsx' code={CustomControl.srcContent} />
             <CustomControl />
           </section>
           <section>
-            <h4>3.2 不在 Form 中使用 Control</h4>
+            <h4>4.2 不在 Form 中使用 Control</h4>
             <section>
               <Code lang='jsx' code={ControlUseWithoutForm.srcContent} />
             </section>

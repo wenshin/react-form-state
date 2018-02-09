@@ -131,15 +131,20 @@ export default class Control extends FormChild {
     if (!children) {
       customChildren = this.renderControl();
     } else {
-      if (children.props[onChangeKey]) {
-        throw new Error(`do not use ${onChangeKey} for children of Control. you can deal with change logic in FormState`);
+      let onChange = this.triggerChange;
+      const elemOnChange = children.props[onChangeKey];
+      if (elemOnChange) {
+        onChange = (...args) => {
+          elemOnChange(...args);
+          this.triggerChange(...args);
+        };
       }
 
       const value = formatValue ? formatValue(this.value) : this.value;
       const props = {
         name,
         [valueKey]: value || '', // input 标签只有设置空字符串才能使得 React 不提示不受限组件变为受限组件
-        [onChangeKey]: this.triggerChange,
+        [onChangeKey]: onChange,
       };
 
       customChildren = React.cloneElement(children, props);

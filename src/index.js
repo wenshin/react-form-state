@@ -2,7 +2,6 @@ import Explain from './Explain';
 import FormState from './FormState';
 
 import Form from './Form.jsx';
-import ExplainBase from './ExplainBase.jsx';
 import ExplainText from './ExplainText.jsx';
 import Field from './Field.jsx';
 import Control from './Control.jsx';
@@ -20,7 +19,6 @@ export {
   ControlCollector,
 
   Explain,
-  ExplainBase,
   ExplainText,
   Field,
   /**

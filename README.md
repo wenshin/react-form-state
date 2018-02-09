@@ -20,6 +20,9 @@ Not Spport React Native.
 
 ## Releases
 
+**3.1.1**
+> 修复问题
+
 **3.1.0**
 > 修复 Control 子元素使用 onChange 报错的问题
 > ExplainText 优化
